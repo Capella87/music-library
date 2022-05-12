@@ -29,8 +29,10 @@ namespace MusicLibrary
                 DataSource = Path
             };
 
+            bool isNewDB = false;
             if (!File.Exists(Path))
             {
+                isNewDB = true;
                 scsb.Mode = SqliteOpenMode.ReadWriteCreate;
             }
             else scsb.Mode = SqliteOpenMode.ReadWrite;
@@ -39,7 +41,7 @@ namespace MusicLibrary
 
             try
             {
-                this.Connect();
+                this.Connect(isNewDB);
             }
             catch (SqliteException)
             {
@@ -52,16 +54,15 @@ namespace MusicLibrary
             }
         }
 
-        private void Connect()
+        private void Connect(bool isNewDB)
         {
             if (_options == null)
                 throw new NullReferenceException();
-            bool isNew = _options.Contains("Mode=ReadWriteCreate");
 
             using (_connection = new SqliteConnection(_options))
             {
                 _connection.Open();
-                if (isNew)
+                if (isNewDB)
                 {
                     Reset();
                 }
@@ -73,7 +74,7 @@ namespace MusicLibrary
         /// </summary>
         private void Reset()
         {
-            //int 
+            
         }
     }
 }

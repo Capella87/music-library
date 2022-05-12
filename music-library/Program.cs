@@ -15,7 +15,6 @@ namespace MusicLibrary
 
         public static void Main(string[] args)
         {
-            // Check whether database file is exist.
             var myLibrary = new MusicLibrary.Library(Directory.GetCurrentDirectory(), _dbName);
         }
     }
