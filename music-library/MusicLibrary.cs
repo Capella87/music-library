@@ -43,21 +43,31 @@ namespace MusicLibrary
             {
                 this.Connect(isNewDB);
             }
-            catch (SqliteException)
+            catch (SqliteException e)
             {
-                Console.WriteLine("Cannot Connected to the database.");
+                if (e.Message == "")
+                    Console.WriteLine("Cannot Connected to the database.");
+                else Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
                 return;
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException e)
             {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
                 return;
             }
         }
 
+        /// <summary>
+        /// Connect to the database. if isNewDB is true, database file will be created.
+        /// </summary>
+        /// <param name="isNewDB"></param>
+        /// <exception cref="NullReferenceException"></exception>
         private void Connect(bool isNewDB)
         {
             if (_options == null)
-                throw new NullReferenceException();
+                throw new NullReferenceException("NULL options is not accepted.");
 
             using (_connection = new SqliteConnection(_options))
             {
@@ -74,7 +84,48 @@ namespace MusicLibrary
         /// </summary>
         private void Reset()
         {
-            
+            if (_connection == null) throw new NullReferenceException("There's an error in connection.");
+
+            var dropTables = _connection.CreateCommand();
+            dropTables.CommandText =
+                @"
+                 DROP TABLE IF EXISTS artists;
+                 DROP TABLE IF EXISTS album_artists
+                 ";
+
+            dropTables.ExecuteNonQuery();
+
+            var addTables = _connection.CreateCommand();
+            addTables.CommandText =
+                @"
+                CREATE TABLE artists
+                (
+                    id         INTEGER PRIMARY KEY NOT NULL,
+                    artist     TEXT
+                );
+                CREATE TABLE album_artists
+                (
+                    id              INTEGER PRIMARY KEY NOT NULL,
+                    album_artist    TEXT
+                )
+                 ";
+            addTables.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// Scan files in directory or individual file.
+        /// </summary>
+        private void Scan()
+        {
+
+        }
+
+        /// <summary>
+        /// Update database through scanning files.
+        /// </summary>
+        private void Update()
+        {
+
         }
     }
 }
