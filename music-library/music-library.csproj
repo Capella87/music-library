@@ -3,10 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>music_library</RootNamespace>
+    <RootNamespace>MusicLibrary</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>x64</Platforms>
+    <Authors>Capella87</Authors>
+    <Copyright>(c) 2022 Capella87.</Copyright>
+    <AssemblyName>mulib</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
