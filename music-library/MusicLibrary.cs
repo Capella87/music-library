@@ -7,11 +7,12 @@ using Microsoft.Data.Sqlite;
 
 namespace MusicLibrary
 {
-    public partial class Library
+    public class Library
     {
         private SqliteConnection? _connection = null;
         private string? _options = null;
 
+        public SqliteConnection? DBConnection { get { return _connection; } }
         public String FileName { get; set; }
         public String LibraryName { get; set; }
         public String Path { get; set; }
