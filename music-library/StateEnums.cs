@@ -14,4 +14,11 @@ namespace MusicLibrary.State
         FullScan,
         NewFileOnly,
     };
+
+    enum FileType
+    {
+        Music,
+        Playlist,
+        Video,
+    };
 }
