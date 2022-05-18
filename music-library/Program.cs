@@ -5,6 +5,7 @@ using System.Threading;
 using System.Collections.Generic;
 
 using System.CommandLine;
+using System.CommandLine.Help;
 
 namespace MusicLibrary
 {
@@ -20,19 +21,26 @@ namespace MusicLibrary
 
         public static async Task<int> Run(string[] args)
         {
+            if (!File.Exists(Directory.GetCurrentDirectory() + "\\" + _dbName))
+            {
+                Console.WriteLine("Welcome to mulib!");
+                var myLibrary = new Library(Directory.GetCurrentDirectory(), _dbName);
+                Console.WriteLine("New database file is generated.\n");
+                myLibrary.Disconnect();
+            }
+
             return await ParseCommand(args);
         }
 
         private static async Task<int> ParseCommand(string[] args)
         {
-            var rootCommand = new RootCommand("A music library implementation in C#")
+            var rootCommand = new RootCommand("A music library implementation in C#");
+            rootCommand.SetHandler(() =>
             {
-
-            };
+            });
 
             var listCommand = new Command("list", "Show entries in the library.")
             {
-
             };
             
             var updateCommand = new Command("update", "Update database in specified directries.")
