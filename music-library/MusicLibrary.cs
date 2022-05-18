@@ -78,7 +78,7 @@ namespace MusicLibrary
                 _connection.Open();
                 if (connectionOptionStringBuilder.Mode == SqliteOpenMode.ReadWriteCreate)
                 {
-                    Reset();
+                    ResetDatabase();
                 }
             }
         }
@@ -86,7 +86,8 @@ namespace MusicLibrary
         /// <summary>
         /// Reset all tables and create tables.
         /// </summary>
-        private void Reset()
+        /// <exception cref="NullReferenceException"></exception>
+        private void ResetDatabase()
         {
             if (_connection == null) throw new NullReferenceException("There's an error in connection.");
 
@@ -139,6 +140,27 @@ namespace MusicLibrary
         {
             if (_connection != null)
                 _connection.Dispose();
+        }
+
+        /// <summary>
+        /// Connect to database.
+        /// </summary>
+        /// <returns></returns>
+        public bool Connect()
+        {
+            try
+            {
+                bool isFileExist = File.Exists(Path) ? true : false;
+                ConnectDatabase(SetConnectionOptions(isFileExist));
+            }
+            catch (NullReferenceException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+
+            return true;
         }
     }
 }
