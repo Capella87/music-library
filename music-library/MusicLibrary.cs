@@ -17,7 +17,7 @@ namespace MusicLibrary
         public String LibraryName { get; set; }
         public String Path { get; set; }
 
-        public Library(string path, string fileName, string name = "main")
+        public Library(string path, string fileName, bool hasDatabaseFile, string name = "main")
         {
             FileName = fileName;
             LibraryName = name;
@@ -25,24 +25,10 @@ namespace MusicLibrary
                 Path = path + "/" + fileName;
             else Path = path + "\\" + fileName;
 
-            var scsb = new SqliteConnectionStringBuilder()
-            {
-                DataSource = Path
-            };
-
-            bool isNewDB = false;
-            if (!File.Exists(Path))
-            {
-                isNewDB = true;
-                scsb.Mode = SqliteOpenMode.ReadWriteCreate;
-            }
-            else scsb.Mode = SqliteOpenMode.ReadWrite;
-
-            _options = scsb.ToString();
-
             try
             {
-                this.Connect(isNewDB);
+                var opts = SetConnectionOptions(hasDatabaseFile);
+                this.ConnectDatabase(opts);
             }
             catch (SqliteException e)
             {
@@ -61,19 +47,36 @@ namespace MusicLibrary
         }
 
         /// <summary>
-        /// Connect to the database. if isNewDB is true, database file will be created.
+        /// Set SQLite connection options.
         /// </summary>
-        /// <param name="isNewDB"></param>
-        /// <exception cref="NullReferenceException"></exception>
-        private void Connect(bool isNewDB)
+        /// <param name="hasDatabaseFile">Database file existence.</param>
+        /// <returns>Return SqliteConnectionStringBuilder if setting was successful.</returns>
+        private SqliteConnectionStringBuilder? SetConnectionOptions(bool hasDatabaseFile)
         {
-            if (_options == null)
+            var scsb = new SqliteConnectionStringBuilder()
+            {
+                DataSource = this.Path
+            };
+            scsb.Mode = !hasDatabaseFile ? SqliteOpenMode.ReadWriteCreate : SqliteOpenMode.ReadWrite;
+            _options = scsb.ToString();
+
+            return scsb;
+        }
+
+        /// <summary>
+        /// Connect to database with options.
+        /// </summary>
+        /// <param name="connectionOptionStringBuilder">A StringBuilder which contains Connection options</param>
+        /// <exception cref="NullReferenceException"></exception>
+        private void ConnectDatabase(SqliteConnectionStringBuilder connectionOptionStringBuilder)
+        {
+            if (connectionOptionStringBuilder == null)
                 throw new NullReferenceException("NULL options is not accepted.");
 
-            using (_connection = new SqliteConnection(_options))
+            using (_connection = new SqliteConnection(connectionOptionStringBuilder.ToString()))
             {
                 _connection.Open();
-                if (isNewDB)
+                if (connectionOptionStringBuilder.Mode == SqliteOpenMode.ReadWriteCreate)
                 {
                     Reset();
                 }
@@ -127,6 +130,15 @@ namespace MusicLibrary
         private void Update()
         {
 
+        }
+
+        /// <summary>
+        /// Disconnect to database.
+        /// </summary>
+        public void Disconnect()
+        {
+            if (_connection != null)
+                _connection.Dispose();
         }
     }
 }
