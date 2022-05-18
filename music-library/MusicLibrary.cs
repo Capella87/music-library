@@ -95,7 +95,10 @@ namespace MusicLibrary
             dropTables.CommandText =
                 @"
                  DROP TABLE IF EXISTS artists;
-                 DROP TABLE IF EXISTS album_artists
+                 DROP TABLE IF EXISTS album_artists;
+                 DROP TABLE IF EXISTS albums;
+                 DROP TABLE IF EXISTS genres;
+                 DROP TABLE IF EXISTS tracks
                  ";
 
             dropTables.ExecuteNonQuery();
@@ -105,13 +108,43 @@ namespace MusicLibrary
                 @"
                 CREATE TABLE artists
                 (
-                    id         INTEGER PRIMARY KEY NOT NULL,
-                    artist     TEXT
+                    id                  INTEGER PRIMARY KEY NOT NULL,
+                    artist              TEXT
                 );
                 CREATE TABLE album_artists
                 (
-                    id              INTEGER PRIMARY KEY NOT NULL,
-                    album_artist    TEXT
+                    id                  INTEGER PRIMARY KEY NOT NULL,
+                    album_artist        TEXT
+                );
+                CREATE TABLE albums
+                (
+                    id                  INTEGER PRIMARY KEY NOT NULL,
+                    album               TEXT,
+                    album_artist_id     INTEGER,
+                    FOREIGN KEY (album_artist_id) REFERENCES album_artists(id)
+                );
+                CREATE TABLE genres
+                (
+                    id                  INTEGER PRIMARY KEY NOT NULL,
+                    genre               TEXT
+                );
+                CREATE TABLE tracks
+                (
+                    id                  INTEGER PRIMARY KEY NOT NULL,
+                    title               TEXT,
+                    year                INTEGER,
+                    uri                 TEXT NOT NULL,
+                    directory           TEXT,
+                    disc_no             INTEGER,
+                    track_no            INTEGER,
+                    lyrics              TEXT,
+
+                    album_id            INTEGER,
+                    artist_id           INTEGER,
+                    genre_id            INTEGER,
+                    FOREIGN KEY (album_id) REFERENCES albums(id),
+                    FOREIGN KEY (artist_id) REFERENCES artists(id),
+                    FOREIGN KEY (genre_id)  REFERENCES genres(id)
                 )
                  ";
             addTables.ExecuteNonQuery();
