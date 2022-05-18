@@ -55,16 +55,49 @@ namespace MusicLibrary
 
             };
 
-            var searchCommand = new Command("search", "Search database.")
+            var searchCommand = new Command("search", "Search library.")
             {
 
             };
 
-            rootCommand.AddCommand(listCommand);
-            rootCommand.AddCommand(updateCommand);
+            var resetCommand = new Command("reset", "Reset library.")
+            {
+
+            };
+
+            var exportCommand = new Command("export", "Export library as a database file or playlist.")
+            {
+
+            };
+
+            var playlistCommand = new Command("playlist", "Run playlist tools.")
+            {
+
+            };
+
+            var moveCommand = new Command("move", "Move or copy a item.")
+            {
+
+            };
+
+            var configCommand = new Command("config", "Show or edit user settings.")
+            {
+
+            };
+
+            var statsCommand = new Command("stats", "Show statistics.");
+
+            rootCommand.AddCommand(configCommand);
+            rootCommand.AddCommand(exportCommand);
             rootCommand.AddCommand(importCommand);
+            rootCommand.AddCommand(listCommand);
+            rootCommand.AddCommand(moveCommand);
+            rootCommand.AddCommand(playlistCommand);
             rootCommand.AddCommand(removeCommand);
+            rootCommand.AddCommand(resetCommand);
             rootCommand.AddCommand(searchCommand);
+            rootCommand.AddCommand(statsCommand);
+            rootCommand.AddCommand(updateCommand);
 
             return await rootCommand.InvokeAsync(args);
         }
