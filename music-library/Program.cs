@@ -24,7 +24,7 @@ namespace MusicLibrary
             if (!File.Exists(Directory.GetCurrentDirectory() + "\\" + _dbName))
             {
                 Console.WriteLine("Welcome to mulib!");
-                var myLibrary = new Library(Directory.GetCurrentDirectory(), _dbName);
+                var myLibrary = new Library(Directory.GetCurrentDirectory(), _dbName, false);
                 Console.WriteLine("New database file is generated.\n");
                 myLibrary.Disconnect();
             }
@@ -35,9 +35,6 @@ namespace MusicLibrary
         private static async Task<int> ParseCommand(string[] args)
         {
             var rootCommand = new RootCommand("A music library implementation in C#");
-            rootCommand.SetHandler(() =>
-            {
-            });
 
             var listCommand = new Command("list", "Show entries in the library.")
             {
