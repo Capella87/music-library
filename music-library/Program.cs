@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Help;
 
+using MusicLibrary.Utilities;
+
 namespace MusicLibrary
 {
     public static class Program
@@ -21,7 +23,7 @@ namespace MusicLibrary
 
         public static async Task<int> Run(string[] args)
         {
-            if (!File.Exists(Directory.GetCurrentDirectory() + "\\" + _dbName))
+            if (!File.Exists(Utilities.PathTools.GetPath(Directory.GetCurrentDirectory(), _dbName)))
             {
                 Console.WriteLine("Welcome to mulib!");
                 var myLibrary = new Library(Directory.GetCurrentDirectory(), _dbName, false);

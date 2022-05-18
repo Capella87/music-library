@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 
+using MusicLibrary.Utilities;
+
 namespace MusicLibrary
 {
     public class Library
@@ -21,9 +23,7 @@ namespace MusicLibrary
         {
             FileName = fileName;
             LibraryName = name;
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
-                Path = path + "/" + fileName;
-            else Path = path + "\\" + fileName;
+            Path = Utilities.PathTools.GetPath(path, fileName);
 
             try
             {
