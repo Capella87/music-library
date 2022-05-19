@@ -7,7 +7,7 @@ using Microsoft.Data.Sqlite;
 
 using MusicLibrary.Utilities;
 
-namespace MusicLibrary
+namespace MusicLibrary.Database
 {
     public class Library
     {
