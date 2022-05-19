@@ -134,6 +134,7 @@ namespace MusicLibrary
                     title               TEXT,
                     year                INTEGER,
                     uri                 TEXT NOT NULL,
+                    modified_time       INTEGER NOT NULL;
                     directory           TEXT,
                     disc_no             INTEGER,
                     track_no            INTEGER,
