@@ -114,6 +114,11 @@ namespace MusicLibrary
                 fileOption
                 // playlistOption
             };
+            importCommand.AddValidator(result =>
+            {
+                if (result.Children.Count == 0)
+                    result.ErrorMessage = "At least one valid option is required.";
+            });
             importCommand.SetHandler((string? directoryTarget, string? fileTarget) =>
             {
                 try
@@ -125,12 +130,6 @@ namespace MusicLibrary
                     else if (fileTarget != null)
                     {
                         // Scan Directory
-                    }
-                    else
-                    {
-                        // Need to be reviewed.
-                        Console.WriteLine("No valid input.");
-                        return;
                     }
                 }
                 catch (DirectoryNotFoundException e)
