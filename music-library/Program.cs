@@ -45,7 +45,7 @@ namespace MusicLibrary
             {
             };
 
-            var updateCommand = new Command("update", "Update database in specified directries.")
+            var updateCommand = new Command("update", "Update database in specified directories.")
             {
 
             };
