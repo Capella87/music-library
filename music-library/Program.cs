@@ -64,19 +64,19 @@ namespace MusicLibrary
                 string? t = result.GetValueForOption(directoryOption);
                 if (t == null)
                 {
-                    result.ErrorMessage = "Empty argument";
+                    result.ErrorMessage = "Empty argument.";
                     return;
                 }
 
                 if (t.Contains("file:"))
                 {
                     if (!Uri.IsWellFormedUriString(t, UriKind.RelativeOrAbsolute))
-                        result.ErrorMessage = "Invalid URI";
+                        result.ErrorMessage = "Invalid URI.";
                     return;
                 }
 
                 if (!Directory.Exists(t))
-                    result.ErrorMessage = "Invalid directory path";
+                    result.ErrorMessage = "Invalid directory path.";
             });
 
             var fileOption = new Option<string?>(
@@ -93,19 +93,19 @@ namespace MusicLibrary
                 string? t = result.GetValueForOption(fileOption);
                 if (t == null)
                 {
-                    result.ErrorMessage = "Empty argument";
+                    result.ErrorMessage = "Empty argument.";
                     return;
                 }
 
                 if (t.Contains("file:"))
                 {
                     if (!Uri.IsWellFormedUriString(t, UriKind.RelativeOrAbsolute))
-                        result.ErrorMessage = "Invalid URI";
+                        result.ErrorMessage = "Invalid URI.";
                     return;
                 }
 
                 if (!File.Exists(t))
-                    result.ErrorMessage = "Invalid file path";
+                    result.ErrorMessage = "Invalid file path.";
             });
 
             var importCommand = new Command("import", "Import a file, playlist or files in specific directory.")
