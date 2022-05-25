@@ -9,6 +9,7 @@ using System.CommandLine.Help;
 
 using MusicLibrary.Utilities;
 using MusicLibrary.Database;
+using System.CommandLine.Invocation;
 
 namespace MusicLibrary
 {
@@ -42,16 +43,104 @@ namespace MusicLibrary
             var listCommand = new Command("list", "Show entries in the library.")
             {
             };
-            
+
             var updateCommand = new Command("update", "Update database in specified directries.")
             {
 
             };
 
+            var directoryOption = new Option<string?>(
+                name: "--dir",
+                // getDefaultValue: () => null,
+                description: "Import a directory."
+                )
+            {
+                Arity = ArgumentArity.ExactlyOne,
+                AllowMultipleArgumentsPerToken = false
+            };
+            directoryOption.AddValidator(result =>
+            {
+                string? t = result.GetValueForOption(directoryOption);
+                if (t == null)
+                {
+                    result.ErrorMessage = "Empty argument";
+                    return;
+                }
+
+                if (t.Contains("file:"))
+                {
+                    if (!Uri.IsWellFormedUriString(t, UriKind.RelativeOrAbsolute))
+                        result.ErrorMessage = "Invalid URI";
+                    return;
+                }
+
+                if (!Directory.Exists(t))
+                    result.ErrorMessage = "Invalid directory path";
+            });
+
+            var fileOption = new Option<string?>(
+                name: "--file",
+                // getDefaultValue: () => null,
+                description: "Import a file."
+                )
+            {
+                Arity = ArgumentArity.ExactlyOne,
+                AllowMultipleArgumentsPerToken = false
+            };
+            fileOption.AddValidator(result =>
+            {
+                string? t = result.GetValueForOption(fileOption);
+                if (t == null)
+                {
+                    result.ErrorMessage = "Empty argument";
+                    return;
+                }
+
+                if (t.Contains("file:"))
+                {
+                    if (!Uri.IsWellFormedUriString(t, UriKind.RelativeOrAbsolute))
+                        result.ErrorMessage = "Invalid URI";
+                    return;
+                }
+
+                if (!File.Exists(t))
+                    result.ErrorMessage = "Invalid file path";
+            });
+
             var importCommand = new Command("import", "Import a file, playlist or files in specific directory.")
             {
-
+                directoryOption,
+                fileOption
+                // playlistOption
             };
+            importCommand.SetHandler((string? directoryTarget, string? fileTarget) =>
+            {
+                try
+                {
+                    if (directoryTarget != null)
+                    {
+                        // Scan Directory
+                    }
+                    else if (fileTarget != null)
+                    {
+                        // Scan Directory
+                    }
+                    else
+                    {
+                        // Need to be reviewed.
+                        Console.WriteLine("No valid input.");
+                        return;
+                    }
+                }
+                catch (DirectoryNotFoundException e)
+                {
+
+                }
+                catch (FileNotFoundException e)
+                {
+
+                }
+            }, directoryOption, fileOption);
 
             var removeCommand = new Command("remove", "Remove an entry or specified directory from the library.")
             {      
