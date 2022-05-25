@@ -10,6 +10,7 @@
     <Authors>Capella87</Authors>
     <Copyright>(c) 2022 Capella87.</Copyright>
     <AssemblyName>mulib</AssemblyName>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
