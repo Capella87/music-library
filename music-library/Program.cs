@@ -75,6 +75,9 @@ namespace MusicLibrary
                     return;
                 }
 
+                t = PathTools.GetPath(t);
+                if (PathTools.IsRelativePath(t))
+                    t = Path.GetFullPath(t);
                 if (!Directory.Exists(t))
                     result.ErrorMessage = "Invalid directory path.";
             });
@@ -104,6 +107,9 @@ namespace MusicLibrary
                     return;
                 }
 
+                t = PathTools.GetPath(t);
+                if (PathTools.IsRelativePath(t))
+                    t = Path.GetFullPath(t);
                 if (!File.Exists(t))
                     result.ErrorMessage = "Invalid file path.";
             });
