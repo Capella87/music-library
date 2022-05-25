@@ -15,7 +15,8 @@ namespace MusicLibrary
 {
     public static class Program
     {
-        private static string _dbPath = @"\";
+        private static string _dbPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic
+            , Environment.SpecialFolderOption.Create);
         private static string _dbName = @"musiclibrary.db";
 
         public static async Task<int> Main(string[] args)
@@ -25,10 +26,10 @@ namespace MusicLibrary
 
         public static async Task<int> Run(string[] args)
         {
-            if (!File.Exists(PathTools.GetPath(Directory.GetCurrentDirectory(), _dbName)))
+            if (!File.Exists(PathTools.GetPath(_dbPath, _dbName)))
             {
                 Console.WriteLine("Welcome to mulib!");
-                var myLibrary = new Library(Directory.GetCurrentDirectory(), _dbName, false);
+                var myLibrary = new Library(_dbPath, _dbName, false);
                 Console.WriteLine("New database file is generated.\n");
                 myLibrary.Disconnect();
             }
