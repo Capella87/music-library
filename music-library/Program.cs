@@ -72,6 +72,12 @@ namespace MusicLibrary
                 {
                     if (!Uri.IsWellFormedUriString(t, UriKind.RelativeOrAbsolute))
                         result.ErrorMessage = "Invalid URI.";
+                    else
+                    {
+                        var target = new Uri(t);
+                        if (!Directory.Exists(target.AbsolutePath))
+                            result.ErrorMessage = "Invalid URI.";
+                    }
                     return;
                 }
 
@@ -104,6 +110,12 @@ namespace MusicLibrary
                 {
                     if (!Uri.IsWellFormedUriString(t, UriKind.RelativeOrAbsolute))
                         result.ErrorMessage = "Invalid URI.";
+                    else
+                    {
+                        var target = new Uri(t);
+                        if (!File.Exists(target.AbsolutePath))
+                            result.ErrorMessage = "Invalid URI.";
+                    }
                     return;
                 }
 
