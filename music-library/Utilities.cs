@@ -38,7 +38,7 @@ namespace MusicLibrary.Utilities
         /// <param name="platform">Running platforms.</param>
         /// <returns>Returns a StringBuilder contains corrected path</returns>
         private static StringBuilder CorrectPath(string target, PlatformID platform)
-            {
+        {
             var rt = new StringBuilder(target);
             if (platform == PlatformID.Unix)
                 rt.Replace('\\', '/');
@@ -46,7 +46,7 @@ namespace MusicLibrary.Utilities
                 rt.Replace('/', '\\');
 
             return rt;
-            }
+        }
 
         /// <summary>
         /// Check whether the path is relative or not.
@@ -71,7 +71,6 @@ namespace MusicLibrary.Utilities
         {
             rt = new Dictionary<Uri, DateTime>();
             List<Uri> failed = new();
-
 
             foreach (var e in files)
             {
@@ -98,6 +97,5 @@ namespace MusicLibrary.Utilities
 
             return failed;
         }
-
     }
 }
