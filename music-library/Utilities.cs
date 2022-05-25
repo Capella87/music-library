@@ -36,7 +36,7 @@ namespace MusicLibrary.Utilities
         /// </summary>
         /// <param name="target">A targeted path to be corrected.</param>
         /// <param name="platform">Running platforms.</param>
-        /// <returns></returns>
+        /// <returns>Returns a StringBuilder contains corrected path</returns>
         private static StringBuilder CorrectPath(string target, PlatformID platform)
             {
             var rt = new StringBuilder(target);
@@ -48,8 +48,14 @@ namespace MusicLibrary.Utilities
             return rt;
             }
 
-            rt.Append(fileName);
-            return rt.ToString();
+        /// <summary>
+        /// Check whether the path is relative or not.
+        /// </summary>
+        /// <param name="path">A target path to be checked.</param>
+        /// <returns>Returns true if the path is relative.</returns>
+        public static bool IsRelativePath(string path)
+        {
+            return (path.StartsWith("./") || path.StartsWith(".\\")) ? true : false;
         }
     }
 
