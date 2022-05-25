@@ -55,7 +55,7 @@ namespace MusicLibrary.Utilities
         /// <returns>Returns true if the path is relative.</returns>
         public static bool IsRelativePath(string path)
         {
-            return (path.StartsWith("./") || path.StartsWith(".\\")) ? true : false;
+            return path.StartsWith("./") || path.StartsWith(".\\") || path.StartsWith("..");
         }
     }
 
