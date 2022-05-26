@@ -136,6 +136,8 @@ namespace MusicLibrary
             {
                 if (result.Children.Count == 0)
                     result.ErrorMessage = "At least one valid option is required.";
+                else if (result.Children.Count > 1)
+                    result.ErrorMessage = "Only one target type option for the command is accepted.";
             });
             importCommand.SetHandler((string? directoryTarget, string? fileTarget) =>
             {
