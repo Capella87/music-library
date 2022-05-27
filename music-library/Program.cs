@@ -143,7 +143,8 @@ namespace MusicLibrary
             {
                 if (directoryTarget != null)
                 {
-                    
+                    var comm = new Commands.ImportDirectory(_dbPath, _dbName);
+                    await comm.Import(directoryTarget);
                 }
                 else if (fileTarget != null)
                 {
