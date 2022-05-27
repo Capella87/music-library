@@ -32,15 +32,20 @@ namespace MusicLibrary.Database
             }
             catch (SqliteException e)
             {
+                Console.BackgroundColor = ConsoleColor.Red;
                 if (e.Message == "")
                     Console.WriteLine("Cannot Connected to the database.");
                 else Console.WriteLine(e.Message);
+                Console.ResetColor();
                 Console.WriteLine(e.StackTrace);
                 return;
             }
             catch (NullReferenceException e)
             {
+                Console.BackgroundColor = ConsoleColor.Red;
                 Console.WriteLine(e.Message);
+                Console.ResetColor();
+
                 Console.WriteLine(e.StackTrace);
                 return;
             }
