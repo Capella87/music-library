@@ -18,13 +18,48 @@ namespace MusicLibrary.Result
         private int _failedCount = 0;
         private int _total = 0;
 
-        public int SuccessCount { get { return _successCount; } }
-        public int FailedCount { get { return _failedCount; } }
-        public int Total { get { return _total; } }
+        public int SuccessCount
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _successCount;
+                }
+            }
+        }
+
+        public int FailedCount
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _failedCount;
+                }
+            }
+        }
+
+        public int Total
+        {
+            get
+            {
+                return _total;
+            }
+        }
 
         public ImportResult()
         {
             _failedEntries = new List<T>();
+        }
+
+        public ImportResult(List<T> t)
+        {
+            _failedEntries = t;
+            lock (_lock)
+            {
+                _failedCount = t.Count;
+            }
         }
 
         /// <summary>
