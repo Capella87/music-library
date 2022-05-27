@@ -78,13 +78,16 @@ namespace MusicLibrary.Database
             if (connectionOptionStringBuilder == null)
                 throw new NullReferenceException("NULL options is not accepted.");
 
-            using (_connection = new SqliteConnection(connectionOptionStringBuilder.ToString()))
+            _connection = new SqliteConnection(connectionOptionStringBuilder.ToString());
+            _connection.Open();
+            if (connectionOptionStringBuilder.Mode == SqliteOpenMode.ReadWriteCreate)
             {
+                ResetDatabase();
+                connectionOptionStringBuilder.Mode = SqliteOpenMode.ReadWrite;
+                _options = connectionOptionStringBuilder.ToString();
+                _connection.Close();
+                _connection.ConnectionString = _options;
                 _connection.Open();
-                if (connectionOptionStringBuilder.Mode == SqliteOpenMode.ReadWriteCreate)
-                {
-                    ResetDatabase();
-                }
             }
         }
 
