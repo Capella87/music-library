@@ -165,14 +165,6 @@ namespace MusicLibrary.Database
         }
 
         /// <summary>
-        /// Scan files in directory or individual file.
-        /// </summary>
-        private void Scan()
-        {
-
-        }
-
-        /// <summary>
         /// Update database through scanning files.
         /// </summary>
         private void Update()
@@ -187,40 +179,6 @@ namespace MusicLibrary.Database
         {
             if (_connection != null)
                 _connection.Dispose();
-        }
-
-        /// <summary>
-        /// Connect to database.
-        /// </summary>
-        /// <returns></returns>
-        public bool Connect()
-        {
-            try
-            {
-                bool isFileExist = File.Exists(Path) ? true : false;
-                ConnectDatabase(SetConnectionOptions(isFileExist));
-            }
-            catch (SqliteException e)
-            {
-                Console.BackgroundColor = ConsoleColor.Red;
-                if (e.Message == "")
-                    Console.WriteLine("Cannot connect to the database.");
-                else Console.WriteLine(e.Message);
-                Console.ResetColor();
-                Console.WriteLine(e.StackTrace);
-                return false;
-            }
-            catch (NullReferenceException e)
-            {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine(e.Message);
-                Console.ResetColor();
-
-                Console.WriteLine(e.StackTrace);
-                return false;
-            }
-
-            return true;
         }
     }
 }
