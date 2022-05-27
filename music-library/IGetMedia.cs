@@ -8,9 +8,9 @@ namespace MusicLibrary.Commands
 {
     interface IGetMedia
     {
-        public static Task<int> Import(string path)
+        public async Task<int> Import(string path)
         {
-            return Task.FromResult(0);
+            return 1;
         }
     }
 }
