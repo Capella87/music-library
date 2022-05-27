@@ -49,6 +49,11 @@ namespace MusicLibrary.Database
                 Console.WriteLine(e.StackTrace);
                 return;
             }
+            finally
+            {
+                if (_connection != null)
+                    _connection.Close();
+            }
         }
 
         /// <summary>
