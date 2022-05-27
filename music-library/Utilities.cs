@@ -69,16 +69,30 @@ namespace MusicLibrary.Utilities
     {
         // This can be replaced to Hash?
         public static readonly string[] MusicExtensions =
-            { "mp3", "m4a", "wma", "ogg", "flac", "wav", "alac", "aiff", "ape", "aac" };
+            { ".mp3", ".m4a", ".wma", ".ogg", ".flac", ".wav", ".ape", ".aac" };
 
         public static DateTime GetModifiedTime(Uri uri)
         {
             string absolutePath = PathTools.GetUnescapedAbsolutePath(uri);
             if (!File.Exists(absolutePath))
-                throw new FileNotFoundException("File is not found or not permitted to access.");
+                throw new FileNotFoundException("The file is not found or not permitted to access.");
             try
             {
                 return File.GetLastWriteTimeUtc(absolutePath);
+            }
+            catch (Exception e)
+            {
+                return new DateTime(0);
+            }
+        }
+
+        public static DateTime GetModifiedTime(string path)
+        {
+            if (!File.Exists(path))
+                throw new FileNotFoundException("The file is not found or not permitted to access.");
+            try
+            {
+                return File.GetLastWriteTimeUtc(path);
             }
             catch (Exception e)
             {
