@@ -67,6 +67,10 @@ namespace MusicLibrary.Utilities
 
     public static class FileTools
     {
+        // This can be replaced to Hash?
+        public static readonly string[] MusicExtensions =
+            { "mp3", "m4a", "wma", "ogg", "flac", "wav", "alac", "aiff", "ape", "aac" };
+
         public static DateTime GetModifiedTime(Uri uri)
         {
             string absolutePath = PathTools.GetUnescapedAbsolutePath(uri);
