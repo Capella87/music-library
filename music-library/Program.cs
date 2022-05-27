@@ -75,7 +75,7 @@ namespace MusicLibrary
                     else
                     {
                         var target = new Uri(t);
-                        if (!Directory.Exists(target.AbsolutePath))
+                        if (!Directory.Exists(PathTools.GetUnescapedAbsolutePath(target)))
                             result.ErrorMessage = "Invalid URI.";
                     }
                     return;
@@ -113,7 +113,7 @@ namespace MusicLibrary
                     else
                     {
                         var target = new Uri(t);
-                        if (!File.Exists(target.AbsolutePath))
+                        if (!File.Exists(PathTools.GetUnescapedAbsolutePath(target)))
                             result.ErrorMessage = "Invalid URI.";
                     }
                     return;
