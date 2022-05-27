@@ -139,26 +139,16 @@ namespace MusicLibrary
                 else if (result.Children.Count > 1)
                     result.ErrorMessage = "Only one target type option for the command is accepted.";
             });
-            importCommand.SetHandler((string? directoryTarget, string? fileTarget) =>
+            importCommand.SetHandler(async (string? directoryTarget, string? fileTarget) =>
             {
-                try
+                if (directoryTarget != null)
                 {
-                    if (directoryTarget != null)
-                    {
-                        // Scan Directory
-                    }
-                    else if (fileTarget != null)
-                    {
-                        // Scan Directory
-                    }
+                    
                 }
-                catch (DirectoryNotFoundException e)
+                else if (fileTarget != null)
                 {
-
-                }
-                catch (FileNotFoundException e)
-                {
-
+                    var comm = new Commands.ImportFile(_dbPath, _dbName);
+                    await comm.Import(fileTarget);
                 }
             }, directoryOption, fileOption);
 
