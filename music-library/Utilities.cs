@@ -55,47 +55,41 @@ namespace MusicLibrary.Utilities
         /// <returns>Returns true if the path is relative.</returns>
         public static bool IsRelativePath(string path)
         {
+            if (path == null) throw new ArgumentNullException();
             return path.StartsWith("./") || path.StartsWith(".\\") || path.StartsWith("..");
+        }
+
+        public static string GetUnescapedAbsolutePath(Uri uri)
+        {
+            return Uri.UnescapeDataString(uri.AbsolutePath);
         }
     }
 
     public static class FileTools
     {
-        /// <summary>
-        /// Get last modified date of targeted files.
-        /// </summary>
-        /// <param name="rt">Dictionary which contains file and its modified time. out parameter.</param>
-        /// <param name="files">File list to get modified time.</param>
-        /// <returns>A list containing failed Uris to get modified time.</returns>
-        public static List<Uri> GetModifiedTime(out Dictionary<Uri, DateTime> rt, List<Uri> files)
+        public static DateTime GetModifiedTime(Uri uri)
         {
-            rt = new Dictionary<Uri, DateTime>();
-            List<Uri> failed = new();
-
-            foreach (var e in files)
+            string absolutePath = PathTools.GetUnescapedAbsolutePath(uri);
+            if (!File.Exists(absolutePath))
+                throw new FileNotFoundException("File is not found or not permitted to access.");
+            try
             {
-                try
-                {
-                    var modifiedTime = File.GetLastAccessTimeUtc(e.LocalPath);
-                    rt.Add(e, modifiedTime);
-                }
-                catch (UnauthorizedAccessException err)
-                {
-                    // Logging or print error information in the console.
-
-                    // Add to failed;
-                    failed.Add(e);
-                }
-                catch (NotSupportedException err)
-                {
-                    // Logging or print error information in the console.
-
-                    // Add to failed
-                    failed.Add(e);
-                }
+                return File.GetLastWriteTimeUtc(absolutePath);
             }
+            catch (Exception e)
+            {
+                return new DateTime(0);
+            }
+        }
 
-            return failed;
+        public static bool IsDirectory(Uri uri)
+        {
+            return Directory.Exists(PathTools.GetUnescapedAbsolutePath(uri)) ? true : false;
+        }
+
+        public static bool IsFile(Uri uri)
+        {
+            return File.Exists(PathTools.GetUnescapedAbsolutePath(uri)) ? true : false;
         }
     }
 }
