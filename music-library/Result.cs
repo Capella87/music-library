@@ -9,7 +9,7 @@ using MusicLibrary;
 
 namespace MusicLibrary.Result
 {
-    struct ImportResult<T> : IResult<T>
+    public struct ImportResult<T> : IResult<T>
     {
         private List<T> _failedEntries;
         private readonly static object _lock = new();
