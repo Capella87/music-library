@@ -108,22 +108,44 @@ namespace MusicLibrary
 
                 if (t.Contains("file:"))
                 {
+                    Uri target;
+
                     if (!Uri.IsWellFormedUriString(t, UriKind.RelativeOrAbsolute))
+                    {
                         result.ErrorMessage = "Invalid URI.";
+                        return;
+                    }
                     else
                     {
-                        var target = new Uri(t);
+                        target = new Uri(t);
                         if (!File.Exists(PathTools.GetUnescapedAbsolutePath(target)))
+                        {
                             result.ErrorMessage = "Invalid URI.";
+                            return;
+                        }
                     }
-                    return;
+
+                    // Extension check
+                    string path = PathTools.GetUnescapedAbsolutePath(target);
+                    if (!Array.Exists(FileTools.MusicExtensions, e => e == Path.GetExtension(path)))
+                    {
+                        result.ErrorMessage = $"{Path.GetExtension(path)} - Invalid file extension.";
+                        return;
+                    }
                 }
 
                 t = PathTools.GetPath(t);
                 if (PathTools.IsRelativePath(t))
                     t = Path.GetFullPath(t);
                 if (!File.Exists(t))
+                {
                     result.ErrorMessage = "Invalid file path.";
+                    return;
+                }
+
+                // Extension check
+                if (!Array.Exists(FileTools.MusicExtensions, e => e == Path.GetExtension(t)))
+                    result.ErrorMessage = $"{Path.GetExtension(t)} - Invalid file extension";
             });
 
             var importCommand = new Command("import", "Import a file, playlist or files in specific directory.")
