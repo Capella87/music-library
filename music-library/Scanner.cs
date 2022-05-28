@@ -114,6 +114,10 @@ namespace MusicLibrary.Scanner
             if (scanType == State.ScanType.NewEntryScan)
                 databaseEntitiesUri = _tracks.GetMusicUris(targets);
             else databaseEntitiesUri = _tracks.GetMusicUris();
+
+            var databaseTracks = _tracks.GetTracksModifiedTime();
+
+
         }
     }
 }

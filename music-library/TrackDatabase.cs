@@ -84,8 +84,7 @@ namespace MusicLibrary.Database
             return rt;
         }
 
-        /*
-        public Dictionary<Uri, DateTime> GetTracksModifiedTime(List<Uri> targets)
+        public Dictionary<Uri, DateTime> GetTracksModifiedTime()
         {
             var rt = new Dictionary<Uri, DateTime>();
 
@@ -93,12 +92,28 @@ namespace MusicLibrary.Database
             _library.DBConnection.Open();
 
             var command = _library.DBConnection.CreateCommand();
-            command.CommandText = "SELECT "
+            command.CommandText = "SELECT DISTINCT uri, modified_time from tracks";
+
+            var result = command.ExecuteReader();
+            while (result.Read())
+            {
+                try
+                {
+                    rt.Add(new Uri(result.GetString(0)), result.GetDateTime(1));
+                }
+                catch (ArgumentNullException e)
+                {
+
+                }
+                catch (UriFormatException e)
+                {
+
+                }
+            }
 
             _library.DBConnection.Close();
 
             return rt;
         }
-        */
     }
 }
