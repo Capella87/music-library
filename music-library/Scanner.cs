@@ -17,6 +17,30 @@ namespace MusicLibrary.Scanner
         private Database.Library _library;
         private Database.TrackDatabase _tracks;
         private Result.ImportResult<Uri> _result;
+        private Dictionary<Uri, Database.Tag> _retrievedTags;
+
+        private readonly object _scanLock = new Object();
+
+        internal class ScanInfo
+        {
+            private (Uri, DateTime)[] _target;
+            private readonly State.ScanType _scanType;
+            private readonly Dictionary<Uri, DateTime> _databaseModifiedTimes;
+            private CancellationToken _cts;
+
+            public (Uri, DateTime)[] ScanTarget { get { return _target; } }
+            public State.ScanType ScanTypeInfo { get { return _scanType; } }
+            public Dictionary<Uri, DateTime> DatabaseModifiedTimes { get { return _databaseModifiedTimes; } }
+            public CancellationToken CancellationToken { get { return _cts; } }
+
+            public ScanInfo((Uri, DateTime)[] target, State.ScanType scanType, Dictionary<Uri, DateTime> dbTimes, CancellationToken token)
+            {
+                _target = target;
+                _scanType = scanType;
+                _databaseModifiedTimes = dbTimes;
+                _cts = token;
+            }
+        }
 
         public Scanner(Database.Library library)
         {
@@ -108,7 +132,7 @@ namespace MusicLibrary.Scanner
         {
             var (files, directories, streams) = GetUriObjects(State.ScanType.NewEntryScan, targets, out List<Uri> failed);
 
-            _result = new Result.ImportResult<Uri>();
+            _result = new Result.ImportResult<Uri>(files.Count);
 
             List<Uri>? databaseEntitiesUri = null;
             if (scanType == State.ScanType.NewEntryScan)
@@ -118,6 +142,134 @@ namespace MusicLibrary.Scanner
             var databaseTracks = _tracks.GetTracksModifiedTime();
 
 
+            // Use two thread; it can be changed to use more threads depending on systems...
+            _retrievedTags = new Dictionary<Uri, Database.Tag>();
+
+            int fileCount = files.Count;
+            int splitCount = fileCount / 2;
+            var chunks = files.Chunk(splitCount + 1);
+            var first = chunks.First();
+            var second = chunks.Last();
+
+            // It would be replaced to TaskFactory
+            Thread[] scanThreads = new Thread[2];
+            var tokenSource = new CancellationTokenSource();
+
+            try
+            {
+                if (fileCount > 1)
+                {
+                    scanThreads[0] = new Thread(ScanFile);
+                    scanThreads[1] = new Thread(ScanFile);
+
+                    scanThreads[0].Start((Object?)new ScanInfo(first, scanType, databaseTracks, tokenSource.Token));
+                    scanThreads[1].Start((Object?)new ScanInfo(second, scanType, databaseTracks, tokenSource.Token));
+
+                    scanThreads[0].Join();
+                    scanThreads[1].Join();
+                }
+                else
+                {
+                    scanThreads[0] = new Thread(ScanFile);
+                    scanThreads[0].Start((Object?)new ScanInfo(first, scanType, databaseTracks, tokenSource.Token));
+                    scanThreads[0].Join();
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message);
+                Console.ResetColor();
+
+                Console.WriteLine(e.StackTrace);
+                return;
+            }
+            catch (InvalidOperationException e)
+            {
+                tokenSource.Cancel();
+                tokenSource.Dispose();
+                return;
+            }
+        }
+
+        private void ScanFile(object? scanInfo)
+        {
+            try
+            {
+                ScanInfo? info = (ScanInfo?)scanInfo;
+                if (info == null) throw new ArgumentNullException("Invalid Scan informations.");
+
+                foreach (var target in info.ScanTarget)
+                {
+                    DateTime dbTime;
+                    info.DatabaseModifiedTimes.TryGetValue(target.Item1, out dbTime);
+                    
+                    if (target.Item2 > dbTime)
+                    {
+                        var tag = GetTagFromFile(target.Item1);
+                        if (tag != null)
+                        {
+                            lock (_scanLock)
+                            {
+                                _retrievedTags[target.Item1] = tag;
+                            }
+                        }
+                    }
+                    else continue;
+                }
+            }
+            catch (OperationCanceledException e)
+            {
+                Console.WriteLine("Operation cancellation is requested. Halt this task.");
+                throw;
+                return;
+            }
+
+        }
+
+        private Database.Tag? GetTagFromFile(Uri uri)
+        {
+            Database.Tag? rt = null;
+            string absolutePath = PathTools.GetUnescapedAbsolutePath(uri);
+            try
+            {
+                var target = TagLib.File.Create(absolutePath);
+
+                rt = new Database.Tag
+                {
+                    Title = target.Tag.Title,
+                    URI = uri,
+                    Artist = target.Tag.Performers.Length > 0 ? target.Tag.Performers[0] : null,
+                    AlbumArtist = target.Tag.AlbumArtists.Length > 0 ? target.Tag.AlbumArtists[0] : null,
+                    Genre = target.Tag.Genres.Length > 0 ? target.Tag.Genres[0] : null,
+                    Year = target.Tag.Year,
+                    ImportedTime = DateTime.UtcNow,
+                    ModifiedTime = File.GetLastWriteTimeUtc(absolutePath),
+                    Duration = target.Properties.Duration,
+                    Bitrates = target.Properties.AudioBitrate,
+                    AudioSampleRates = target.Properties.AudioSampleRate,
+                    AudioChannels = target.Properties.AudioChannels,
+                    AbsolutePath = absolutePath,
+                    DiskNumber = target.Tag.Disc,
+                    TrackNumber = target.Tag.Track,
+                    Lyrics = target.Tag.Lyrics
+                };
+
+                _result.AddSuccessCount();
+                target.Dispose();
+            }
+            catch (TagLib.CorruptFileException e)
+            {
+                Console.WriteLine($"Failed to load {PathTools.GetUnescapedAbsolutePath(uri)}. This file is corrupted.");
+                _result.AddErrorEntryList(uri);
+            }
+            catch (TagLib.UnsupportedFormatException e)
+            {
+                Console.WriteLine($"Failed to load {PathTools.GetUnescapedAbsolutePath(uri)}. This file is not supported format.");
+                _result.AddErrorEntryList(uri);
+            }
+
+            return rt;
         }
     }
 }
