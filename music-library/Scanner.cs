@@ -94,13 +94,14 @@ namespace MusicLibrary.Scanner
                         directories.Add(uri);
 
                         var subdirectories = Directory.EnumerateDirectories(path, "*",
-                            new EnumerationOptions() { IgnoreInaccessible = true});
+                            new EnumerationOptions() { IgnoreInaccessible = true });
                         foreach (var sub in subdirectories)
                             q.Enqueue(new Uri(sub));
 
                         // source: https://gist.github.com/zaus/7454021
                         var musics = FileTools.MusicExtensions.Select(x => "*" + x)
-                            .SelectMany(x => Directory.EnumerateFiles(path, x));
+                            .SelectMany(x => Directory.EnumerateFiles
+                            (path, x, new EnumerationOptions() { IgnoreInaccessible = true }));
                         foreach (var musicFile in musics)
                         {
                             var mf = new Uri(musicFile);
