@@ -155,7 +155,7 @@ namespace MusicLibrary.Database
                     track_no            INTEGER,
                     bitrates            INTEGER,
                     audio_samplerates   INTEGER,
-                    audio_channel       INTEGER,
+                    audio_channels      INTEGER,
                     lyrics              TEXT,
 
                     album_id            INTEGER,
