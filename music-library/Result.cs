@@ -44,17 +44,22 @@ namespace MusicLibrary.Result
         {
             get
             {
-                return _total;
+                lock (_lock)
+                {
+                    return _total;
+                }
             }
         }
 
-        public ImportResult()
+        public ImportResult(int total)
         {
+            _total = total;
             _failedEntries = new List<T>();
         }
 
-        public ImportResult(List<T> t)
+        public ImportResult(int total, List<T> t)
         {
+            _total = total;
             _failedEntries = t;
             lock (_lock)
             {
@@ -88,7 +93,6 @@ namespace MusicLibrary.Result
             {
                 _failedEntries.Add(item);
                 _failedCount++;
-                _total++;
             }
         }
 
@@ -100,7 +104,6 @@ namespace MusicLibrary.Result
             lock(_lock)
             {
                 _successCount++;
-                _total++;
             }
         }
     }
