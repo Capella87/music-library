@@ -92,9 +92,11 @@ namespace MusicLibrary.Scanner
                     if (Utilities.FileTools.IsDirectory(uri))
                     {
                         directories.Add(uri);
-                        /*
-                        var subdirectories = Directory.EnumerateDirectories(path);
-                        */
+
+                        var subdirectories = Directory.EnumerateDirectories(path, "*",
+                            new EnumerationOptions() { IgnoreInaccessible = true});
+                        foreach (var sub in subdirectories)
+                            q.Enqueue(new Uri(sub));
 
                         // source: https://gist.github.com/zaus/7454021
                         var musics = FileTools.MusicExtensions.Select(x => "*" + x)
@@ -190,6 +192,9 @@ namespace MusicLibrary.Scanner
                 tokenSource.Dispose();
                 return;
             }
+
+            Console.WriteLine("Checkpoint");
+            // await SaveToDatabase();
         }
 
         private void ScanFile(object? scanInfo)
@@ -271,5 +276,46 @@ namespace MusicLibrary.Scanner
 
             return rt;
         }
+
+        /*
+        private Task SaveToDatabase()
+        {
+            try
+            {
+                Console.WriteLine($"Adding {} file to library.");
+            }
+            catch (OperationCanceledException e)
+            {
+
+            }
+        }
+        */
+
+        /*
+        private Task InsertTuple()
+        {
+
+        }
+
+        private bool AddArtist()
+        {
+
+        }
+
+        private bool AddTrack()
+        {
+
+        }
+
+        private bool AddAlbumArtist()
+        {
+
+        }
+
+        private bool AddAlbumArtists()
+        {
+
+        }
+        */
     }
 }
