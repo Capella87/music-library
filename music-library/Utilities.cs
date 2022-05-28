@@ -71,6 +71,9 @@ namespace MusicLibrary.Utilities
         public static readonly string[] MusicExtensions =
             { ".mp3", ".m4a", ".wma", ".ogg", ".flac", ".wav", ".ape", ".aac" };
 
+        public static readonly string[] PlaylistExtensions =
+            { ".pls", ".m3u", ".m3u8", ".xspf", ".zpl", "wpl", ".jspf" };
+
         public static DateTime GetModifiedTime(Uri uri)
         {
             string absolutePath = PathTools.GetUnescapedAbsolutePath(uri);
