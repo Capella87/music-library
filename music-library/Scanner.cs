@@ -22,6 +22,7 @@ namespace MusicLibrary.Scanner
         {
             if (library == null) throw new ArgumentNullException("Invalid library connection.");
             else _library = library;
+            _tracks = new Database.TrackDatabase(_library);
         }
 
         public async Task<Result.ImportResult<Uri>> UpdateDatabase(State.ScanType scanType, List<Uri> targets)
@@ -108,6 +109,11 @@ namespace MusicLibrary.Scanner
             var (files, directories, streams) = GetUriObjects(State.ScanType.NewEntryScan, targets, out List<Uri> failed);
 
             _result = new Result.ImportResult<Uri>();
+
+            List<Uri>? databaseEntitiesUri = null;
+            if (scanType == State.ScanType.NewEntryScan)
+                databaseEntitiesUri = _tracks.GetMusicUris(targets);
+            else databaseEntitiesUri = _tracks.GetMusicUris();
         }
     }
 }
