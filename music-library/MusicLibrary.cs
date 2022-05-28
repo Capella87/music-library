@@ -147,6 +147,7 @@ namespace MusicLibrary.Database
                     title               TEXT,
                     year                INTEGER,
                     uri                 TEXT NOT NULL,
+                    imported_time       TEXT NOT NULL,
                     modified_time       TEXT NOT NULL,
                     duration            TEXT NOT NULL,
                     directory           TEXT,
