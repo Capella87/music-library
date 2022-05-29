@@ -11,6 +11,7 @@ namespace MusicLibrary.Database
         public string?      Title { get; init; }
         public Uri          URI { get; init; }
         public string?      Artist { get; init; }
+        public string?      Album { get; init; }
         public string?      AlbumArtist { get; init; }
         public string?      Genre { get; init; }
         public uint         Year { get; init; }
@@ -21,8 +22,8 @@ namespace MusicLibrary.Database
         public int          AudioSampleRates { get; init; }
         public int          AudioChannels { get; init; }
         public string       AbsolutePath { get; set; }
-        public uint         DiscNumber { get; init; }
-        public uint         TrackNumber { get; init; }
+        public uint?        DiscNumber { get; init; }
+        public uint?        TrackNumber { get; init; }
         public string?      Lyrics { get; init; }
     }
 }
