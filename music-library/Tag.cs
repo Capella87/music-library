@@ -21,7 +21,7 @@ namespace MusicLibrary.Database
         public int          AudioSampleRates { get; init; }
         public int          AudioChannels { get; init; }
         public string       AbsolutePath { get; set; }
-        public uint         DiskNumber { get; init; }
+        public uint         DiscNumber { get; init; }
         public uint         TrackNumber { get; init; }
         public string?      Lyrics { get; init; }
     }
