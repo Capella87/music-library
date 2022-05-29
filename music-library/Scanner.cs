@@ -1,13 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-
 using Microsoft.Data.Sqlite;
-
-using MusicLibrary;
 using MusicLibrary.Utilities;
 
 namespace MusicLibrary.Scanner
@@ -30,10 +21,14 @@ namespace MusicLibrary.Scanner
             private readonly Dictionary<Uri, DateTime> _databaseModifiedTimes;
             private CancellationToken _cts;
 
-            public (Uri, DateTime)[] ScanTarget { get { return _target; } }
-            public State.ScanType ScanTypeInfo { get { return _scanType; } }
-            public Dictionary<Uri, DateTime> DatabaseModifiedTimes { get { return _databaseModifiedTimes; } }
-            public CancellationToken CancellationToken { get { return _cts; } }
+            public (Uri, DateTime)[] ScanTarget
+            { get { return _target; } }
+            public State.ScanType ScanTypeInfo
+            { get { return _scanType; } }
+            public Dictionary<Uri, DateTime> DatabaseModifiedTimes
+            { get { return _databaseModifiedTimes; } }
+            public CancellationToken CancellationToken
+            { get { return _cts; } }
 
             public ScanInfo((Uri, DateTime)[] target, State.ScanType scanType, Dictionary<Uri, DateTime> dbTimes, CancellationToken token)
             {
@@ -58,7 +53,6 @@ namespace MusicLibrary.Scanner
             if (scanType == State.ScanType.FullScan)
             {
                 // Get music uris from settings
-                
             }
 
             await Scan(scanType, targets);
@@ -76,7 +70,7 @@ namespace MusicLibrary.Scanner
             failed = new List<Uri>();
 
             var q = new Queue<Uri>();
-            
+
             foreach (var uri in uris)
             {
                 if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
@@ -88,7 +82,7 @@ namespace MusicLibrary.Scanner
             while (q.Count > 0)
             {
                 var uri = q.Dequeue();
-                
+
                 try
                 {
                     string path = Utilities.PathTools.GetUnescapedAbsolutePath(uri);
@@ -120,15 +114,13 @@ namespace MusicLibrary.Scanner
                 }
                 catch (FileNotFoundException e)
                 {
-                    // Add 
+                    // Add
                 }
                 catch (DirectoryNotFoundException e)
                 {
-
                 }
                 catch (NotSupportedException e)
                 {
-
                 }
             }
 
@@ -147,7 +139,6 @@ namespace MusicLibrary.Scanner
             else databaseEntitiesUri = _tracks.GetMusicUris();
 
             var databaseTracks = _tracks.GetTracksModifiedTime();
-
 
             // Use two thread; it can be changed to use more threads depending on systems...
             _retrievedTags = new Dictionary<Uri, Database.Tag>();
@@ -198,7 +189,7 @@ namespace MusicLibrary.Scanner
                 return;
             }
 
-            await SaveToDatabase();
+            SaveToDatabase();
         }
 
         private void ScanFile(object? scanInfo)
@@ -212,7 +203,7 @@ namespace MusicLibrary.Scanner
                 {
                     DateTime dbTime;
                     info.DatabaseModifiedTimes.TryGetValue(target.Item1, out dbTime);
-                    
+
                     if (target.Item2 > dbTime)
                     {
                         var tag = GetTagFromFile(target.Item1);
@@ -233,7 +224,6 @@ namespace MusicLibrary.Scanner
                 throw;
                 return;
             }
-
         }
 
         private Database.Tag? GetTagFromFile(Uri uri)
@@ -249,6 +239,7 @@ namespace MusicLibrary.Scanner
                     Title = target.Tag.Title,
                     URI = uri,
                     Artist = target.Tag.Performers.Length > 0 ? target.Tag.Performers[0] : null,
+                    Album = target.Tag.Album,
                     AlbumArtist = target.Tag.AlbumArtists.Length > 0 ? target.Tag.AlbumArtists[0] : null,
                     Genre = target.Tag.Genres.Length > 0 ? target.Tag.Genres[0] : null,
                     Year = target.Tag.Year,
@@ -280,60 +271,122 @@ namespace MusicLibrary.Scanner
             return rt;
         }
 
-        private Task SaveToDatabase()
+        private int SaveToDatabase()
         {
-            try
+            foreach (var file in _retrievedTags)
             {
-                foreach (var file in _retrievedTags)
+                try
                 {
                     InsertTuple(file.Value);
                     Console.WriteLine($"Adding {file.Value.AbsolutePath} file to library.");
                     _retrievedTags.Remove(file.Key);
                     _result.AddSuccessCount();
                 }
-            }
-            catch (SqliteException e)
-            {
-                return null;
-            }
-            catch (OperationCanceledException e)
-            {
-                return null;
-            }
-            finally
-            {
-                _retrievedTags.Clear();
-            }
+                catch (SqliteException e)
+                {
+                    /*
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                    */
+                    Console.WriteLine($"Failed to add {file.Value.AbsolutePath} file to library.");
 
-            return Task;
+                    // Add debug info in logger.
+
+                    _result.AddErrorEntryList(file.Value.URI);
+                }
+                catch (OperationCanceledException e)
+                {
+                    _retrievedTags.Clear();
+                    return -1;
+                }
+            }
+            _retrievedTags.Clear();
+            return 0;
         }
 
         private void InsertTuple(Database.Tag tag)
         {
-            InsertAlbum(tag);
-            InsertTrack(tag);
-
+            var (albumArtistId, albumId) = InsertAlbum(tag);
+            var artistId = InsertArtist(tag);
+            var (trackId, genreId) = InsertTrack(tag, albumId, artistId);
         }
 
-        private () InsertArtist(Database.Tag tag)
+        private (long? albumArtistId, long? albumId) InsertAlbum(Database.Tag tag)
         {
-            
+            try
+            {
+                long? albumArtistId = _albums.GetAlbumArtistId(tag.AlbumArtist);
+                if (!albumArtistId.HasValue && albumArtistId == -1) // -1 -> tag is null.
+                    albumArtistId = null;
+                else if (albumArtistId == null) // not exist in the database.
+                    albumArtistId = _albums.AddAlbumArtist(tag.AlbumArtist);
+
+                long? albumId = _albums.GetAlbumId(tag.Album);
+                if (!albumArtistId.HasValue && albumArtistId == -1)
+                    albumId = null;
+                else if (albumId == null)
+                    albumId = _albums.AddAlbum(tag.Album, albumArtistId);
+
+                return (albumArtistId, albumId);
+            }
+            catch (SqliteException e)
+            {
+                throw;
+            }
+            finally
+            {
+                _library.DBConnection.Close();
+            }
         }
 
-        private () InsertTrack(Database.Tag tag)
+        private long? InsertArtist(Database.Tag tag)
         {
+            try
+            {
+                long? artistId = _artists.GetArtistId(tag.Artist);
+                if (!artistId.HasValue && artistId == -1) // -1 -> tag is null.
+                    artistId = null;
+                else if (artistId == null) // not exist in the database.
+                    artistId = _artists.AddArtist(tag.Artist);
 
+                return artistId;
+            }
+            catch (SqliteException e)
+            {
+                throw;
+            }
+            finally
+            {
+                _library.DBConnection.Close();
+            }
         }
 
-        private () InsertAlbumArtist(Database.Tag tag)
+        private (long? trackId, long? genreId) InsertTrack(Database.Tag tag, long? albumId, long? artistId)
         {
-            
-        }
+            try
+            {
+                long? genreId = _tracks.GetGenreId(tag.Genre);
+                if (!genreId.HasValue && genreId == -1) // -1 -> tag is null.
+                    genreId = null;
+                else if (genreId == null) // not exist in the database.
+                    genreId = _tracks.AddGenre(tag.Genre);
 
-        private () InsertAlbum(Database.Tag tag)
-        {
-            
-        }
+                long? trackId = _tracks.GetTrackId(tag.URI);
+                if (!trackId.HasValue && trackId == -1)
+                    trackId = null;
+                else if (trackId == null)
+                    trackId = _tracks.AddTrack(tag, albumId, artistId, genreId);
 
+                return (trackId, albumId);
+            }
+            catch (SqliteException e)
+            {
+                throw;
+            }
+            finally
+            {
+                _library.DBConnection.Close();
+            }
+        }
     }
 }
