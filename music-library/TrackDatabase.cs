@@ -120,28 +120,32 @@ namespace MusicLibrary.Database
         {
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "SELECT id FROM tracks WHERE uri = @keyword";
             command.Parameters.Add(new SqliteParameter("@keyword", uri.AbsoluteUri));
 
             var result = command.ExecuteReader();
+            result.Read();
+            long? rt = !result.HasRows ? null : result.GetInt64(0);
             _library.DBConnection.Close();
 
-            return result?.GetInt64(0);
+            return rt;
         }
 
         public long? GetTrackId(string? title)
         {
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "SELECT id FROM tracks WHERE title = @keyword";
             command.Parameters.Add(new SqliteParameter("@keyword", title));
 
             var result = command.ExecuteReader();
+            result.Read();
+            long? rt = !result.HasRows ? null : result.GetInt64(0);
             _library.DBConnection.Close();
 
-            return result?.GetInt64(0);
+            return rt;
         }
 
         public long? GetGenreId(string? genre)
@@ -150,21 +154,23 @@ namespace MusicLibrary.Database
 
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "SELECT id FROM genres WHERE genre = @keyword";
             command.Parameters.Add(new SqliteParameter("@keyword", genre));
 
             var result = command.ExecuteReader();
+            result.Read();
+            long? rt = !result.HasRows ? null : result.GetInt64(0);
             _library.DBConnection.Close();
 
-            return result?.GetInt64(0);
+            return rt;
         }
 
         public long AddGenre(string genre)
         {
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "INSERT INTO genres (genre) " +
                 "VALUES (@gen);";
             command.Parameters.Add(new SqliteParameter("@gen", genre));
@@ -186,30 +192,31 @@ namespace MusicLibrary.Database
         {
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "INSERT INTO tracks " +
-                "(title, year, uri, imported_time, modified_time" +
+                "(title, year, uri, imported_time, modified_time, " +
                 "duration, absolute_path, disc_no, track_no, bitrates, audio_samplerates, " +
                 "audio_channels, lyrics, album_id, artist_id, genre_id) " +
-                "VALUES (@tit, @ye, @imptTime, @modiTime, @dur, @absoPath, @disc, @trackNo, @bitra, @audioSampleRate, " +
+                "VALUES (@tit, @ye, @uri, @imptTime, @modiTime, @dur, @absoPath, @disc, @trackNo, @bitra, @audioSampleRate, " +
                 "@audioChannel, @lyri, @albId, @artistId, @genreId)";
-            
-            command.Parameters.Add(new SqliteParameter("@tit", tag.Title));
+
+            command.Parameters.Add(new SqliteParameter("@tit", tag.Title == null ? DBNull.Value : tag.Title));
             command.Parameters.Add(new SqliteParameter("@ye", tag.Year));
+            command.Parameters.Add(new SqliteParameter("@uri", tag.URI.AbsoluteUri));
             command.Parameters.Add(new SqliteParameter("@imptTime", tag.ImportedTime));
             command.Parameters.Add(new SqliteParameter("@modiTime", tag.ModifiedTime));
             command.Parameters.Add(new SqliteParameter("@dur", tag.Duration));
             command.Parameters.Add(new SqliteParameter("@absoPath", tag.AbsolutePath));
-            command.Parameters.Add(new SqliteParameter("@disc", tag.DiscNumber));
-            command.Parameters.Add(new SqliteParameter("@trackNo", tag.TrackNumber));
+            command.Parameters.Add(new SqliteParameter("@disc", tag.DiscNumber == null ? DBNull.Value : tag.DiscNumber));
+            command.Parameters.Add(new SqliteParameter("@trackNo", tag.TrackNumber == null ? DBNull.Value : tag.TrackNumber));
             command.Parameters.Add(new SqliteParameter("@bitra", tag.Bitrates));
             command.Parameters.Add(new SqliteParameter("@audioSampleRate", tag.AudioSampleRates));
             command.Parameters.Add(new SqliteParameter("@audioChannel", tag.AudioChannels));
-            command.Parameters.Add(new SqliteParameter("@lyri", tag.Lyrics));
+            command.Parameters.Add(new SqliteParameter("@lyri", tag.Lyrics == null ? DBNull.Value : tag.Lyrics));
 
-            command.Parameters.Add(new SqliteParameter("@albId", albumId));
-            command.Parameters.Add(new SqliteParameter("@artistId", artistId));
-            command.Parameters.Add(new SqliteParameter("@genreId", genreId));
+            command.Parameters.Add(new SqliteParameter("@albId", albumId == null ? DBNull.Value : albumId));
+            command.Parameters.Add(new SqliteParameter("@artistId", artistId == null ? DBNull.Value : artistId));
+            command.Parameters.Add(new SqliteParameter("@genreId", genreId == null ? DBNull.Value : genreId));
 
             var result = command.ExecuteNonQuery();
 

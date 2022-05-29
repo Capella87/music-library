@@ -25,21 +25,23 @@ namespace MusicLibrary.Database
 
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "SELECT id FROM artists WHERE artist = @keyword";
             command.Parameters.Add(new SqliteParameter("@keyword", artist));
 
             var result = command.ExecuteReader();
+            result.Read();
+            long? rt = !result.HasRows ? null : result.GetInt64(0);
             _library.DBConnection.Close();
 
-            return result?.GetInt64(0);
+            return rt;
         }
 
         public long AddArtist(string artist)
         {
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "INSERT INTO artists (artist) " +
                 "VALUES (@art);";
             command.Parameters.Add(new SqliteParameter("@art", artist));

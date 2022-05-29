@@ -25,14 +25,16 @@ namespace MusicLibrary.Database
 
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "SELECT id FROM albums WHERE album = @keyword";
             command.Parameters.Add(new SqliteParameter("@keyword", album));
 
             var result = command.ExecuteReader();
+            result.Read();
+            long? rt = !result.HasRows ? null : result.GetInt64(0);
             _library.DBConnection.Close();
 
-            return result?.GetInt64(0);
+            return rt;
         }
 
         public long? GetAlbumArtistId(string? albumArtist)
@@ -41,21 +43,23 @@ namespace MusicLibrary.Database
 
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "SELECT id FROM album_artists WHERE album_artist = @keyword";
             command.Parameters.Add(new SqliteParameter("@keyword", albumArtist));
 
             var result = command.ExecuteReader();
-            _library.DBConnection.Close();
+            result.Read();
+            long? rt = !result.HasRows ? null : result.GetInt64(0);
+            _library.DBConnection.Close(); 
 
-            return result?.GetInt64(0);
+            return rt;
         }
 
         public long AddAlbumArtist(string albumArtist)
         {
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "INSERT INTO album_artists (album_artist) " +
                 "VALUES (@alb);";
             command.Parameters.Add(new SqliteParameter("@alb", albumArtist));
@@ -77,7 +81,7 @@ namespace MusicLibrary.Database
         {
             _library.DBConnection.Open();
 
-            var command = new SqliteCommand();
+            var command = _library.DBConnection.CreateCommand();
             command.CommandText = "INSERT INTO albums (album, album_artist_id) " +
                 "VALUES (@alb, @alb_id);";
             command.Parameters.Add(new SqliteParameter("@alb", album));
