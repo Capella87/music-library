@@ -15,9 +15,9 @@ namespace MusicLibrary.Database
         private string? _options = null;
 
         public SqliteConnection? DBConnection { get { return _connection; } }
-        public String FileName { get; set; }
-        public String LibraryName { get; set; }
-        public String Path { get; set; }
+        public string FileName { get; set; }
+        public string LibraryName { get; set; }
+        public string Path { get; set; }
 
         public Library(string path, string fileName, bool hasDatabaseFile, string name = "main")
         {
