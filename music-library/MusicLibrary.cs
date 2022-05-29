@@ -150,7 +150,7 @@ namespace MusicLibrary.Database
                     imported_time       TEXT NOT NULL,
                     modified_time       TEXT NOT NULL,
                     duration            TEXT NOT NULL,
-                    absolute_path       TEXT,
+                    absolute_path       TEXT NOT NULL,
                     disc_no             INTEGER,
                     track_no            INTEGER,
                     bitrates            INTEGER,
