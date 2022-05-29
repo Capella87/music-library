@@ -135,6 +135,7 @@ namespace MusicLibrary.Database
                     album               TEXT,
                     album_artist_id     INTEGER,
                     FOREIGN KEY (album_artist_id) REFERENCES album_artists(id)
+                    ON DELETE SET NULL ON UPDATE CASCADE
                 );
                 CREATE TABLE genres
                 (
@@ -161,9 +162,9 @@ namespace MusicLibrary.Database
                     album_id            INTEGER,
                     artist_id           INTEGER,
                     genre_id            INTEGER,
-                    FOREIGN KEY (album_id) REFERENCES albums(id),
-                    FOREIGN KEY (artist_id) REFERENCES artists(id),
-                    FOREIGN KEY (genre_id)  REFERENCES genres(id)
+                    FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE SET NULL ON UPDATE CASCADE,
+                    FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE SET NULL ON UPDATE CASCADE,
+                    FOREIGN KEY (genre_id)  REFERENCES genres(id) ON DELETE SET NULL ON UPDATE CASCADE
                 )
                  ";
             addTables.ExecuteNonQuery();
