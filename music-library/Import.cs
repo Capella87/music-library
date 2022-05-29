@@ -48,6 +48,8 @@ namespace MusicLibrary.Commands
                     var scan = new Scanner.Scanner(library);
 
                     result = await scan.UpdateDatabase(State.ScanType.NewEntryScan, targets);
+
+                    result.PrintResult();
                 }
             }
             catch (NullReferenceException e)
