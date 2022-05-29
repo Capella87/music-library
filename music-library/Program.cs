@@ -185,10 +185,17 @@ namespace MusicLibrary
 
             };
 
+            var silentOption = new Option("--silent", "Running command without questions.");
+
             var resetCommand = new Command("reset", "Reset library.")
             {
 
             };
+
+            resetCommand.SetHandler(async () =>
+            {
+                await Commands.Reset.ResetDatabase(_dbPath, _dbName);
+            });
 
             var exportCommand = new Command("export", "Export library as a database file or playlist.")
             {

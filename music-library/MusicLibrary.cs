@@ -186,5 +186,25 @@ namespace MusicLibrary.Database
             if (_connection != null)
                 _connection.Dispose();
         }
+
+        public void Reset()
+        {
+            try
+            {
+                _connection.Open();
+                ResetDatabase();
+            }
+            catch (NullReferenceException e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message);
+                Console.ResetColor();
+                Console.WriteLine(e.StackTrace);
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
     }
 }
