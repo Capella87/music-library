@@ -73,12 +73,13 @@ namespace MusicLibrary.Result
         /// <param name="isVerbose">An option to show failed entries. Default is false.</param>
         public void PrintResult(bool isVerbose = false)
         {
-            Console.WriteLine("Import Report:\n");
-            Console.BackgroundColor = ConsoleColor.Green;
-            Console.WriteLine($"{SuccessCount} files imported");
-            Console.BackgroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{FailedCount} failed");
+            Console.WriteLine("Import Report");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"{SuccessCount} files imported");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($", {FailedCount} failed.");
             Console.ResetColor();
+            Console.WriteLine($"{Total - SuccessCount - FailedCount} files were ignored.");
 
             Console.WriteLine($"Total: {Total}");
         }
