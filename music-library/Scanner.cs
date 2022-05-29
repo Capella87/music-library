@@ -316,13 +316,13 @@ namespace MusicLibrary.Scanner
             try
             {
                 long? albumArtistId = _albums.GetAlbumArtistId(tag.AlbumArtist);
-                if (!albumArtistId.HasValue && albumArtistId == -1) // -1 -> tag is null.
+                if (albumArtistId.HasValue && albumArtistId == -1) // -1 -> tag is null.
                     albumArtistId = null;
                 else if (albumArtistId == null) // not exist in the database.
                     albumArtistId = _albums.AddAlbumArtist(tag.AlbumArtist);
 
                 long? albumId = _albums.GetAlbumId(tag.Album);
-                if (!albumArtistId.HasValue && albumArtistId == -1)
+                if (!albumArtistId.HasValue || albumArtistId == -1)
                     albumId = null;
                 else if (albumId == null)
                     albumId = _albums.AddAlbum(tag.Album, albumArtistId);
@@ -344,7 +344,7 @@ namespace MusicLibrary.Scanner
             try
             {
                 long? artistId = _artists.GetArtistId(tag.Artist);
-                if (!artistId.HasValue && artistId == -1) // -1 -> tag is null.
+                if (artistId.HasValue && artistId == -1) // -1 -> tag is null.
                     artistId = null;
                 else if (artistId == null) // not exist in the database.
                     artistId = _artists.AddArtist(tag.Artist);
@@ -366,7 +366,7 @@ namespace MusicLibrary.Scanner
             try
             {
                 long? genreId = _tracks.GetGenreId(tag.Genre);
-                if (!genreId.HasValue && genreId == -1) // -1 -> tag is null.
+                if (genreId.HasValue && genreId == -1) // -1 -> tag is null.
                     genreId = null;
                 else if (genreId == null) // not exist in the database.
                     genreId = _tracks.AddGenre(tag.Genre);
