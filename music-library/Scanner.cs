@@ -16,6 +16,8 @@ namespace MusicLibrary.Scanner
     {
         private Database.Library _library;
         private Database.TrackDatabase _tracks;
+        private Database.AlbumDatabase _albums;
+        private Database.ArtistDatabase _artists;
         private Result.ImportResult<Uri> _result;
         private Dictionary<Uri, Database.Tag> _retrievedTags;
 
@@ -47,6 +49,8 @@ namespace MusicLibrary.Scanner
             if (library == null) throw new ArgumentNullException("Invalid library connection.");
             else _library = library;
             _tracks = new Database.TrackDatabase(_library);
+            _albums = new Database.AlbumDatabase(_library);
+            _artists = new Database.ArtistDatabase(_library);
         }
 
         public async Task<Result.ImportResult<Uri>> UpdateDatabase(State.ScanType scanType, List<Uri> targets)
@@ -194,8 +198,7 @@ namespace MusicLibrary.Scanner
                 return;
             }
 
-            Console.WriteLine("Checkpoint");
-            // await SaveToDatabase();
+            await SaveToDatabase();
         }
 
         private void ScanFile(object? scanInfo)
@@ -256,12 +259,11 @@ namespace MusicLibrary.Scanner
                     AudioSampleRates = target.Properties.AudioSampleRate,
                     AudioChannels = target.Properties.AudioChannels,
                     AbsolutePath = absolutePath,
-                    DiskNumber = target.Tag.Disc,
+                    DiscNumber = target.Tag.Disc,
                     TrackNumber = target.Tag.Track,
                     Lyrics = target.Tag.Lyrics
                 };
 
-                _result.AddSuccessCount();
                 target.Dispose();
             }
             catch (TagLib.CorruptFileException e)
@@ -278,45 +280,60 @@ namespace MusicLibrary.Scanner
             return rt;
         }
 
-        /*
         private Task SaveToDatabase()
         {
             try
             {
-                Console.WriteLine($"Adding {} file to library.");
+                foreach (var file in _retrievedTags)
+                {
+                    InsertTuple(file.Value);
+                    Console.WriteLine($"Adding {file.Value.AbsolutePath} file to library.");
+                    _retrievedTags.Remove(file.Key);
+                    _result.AddSuccessCount();
+                }
+            }
+            catch (SqliteException e)
+            {
+                return null;
             }
             catch (OperationCanceledException e)
             {
-
+                return null;
             }
-        }
-        */
+            finally
+            {
+                _retrievedTags.Clear();
+            }
 
-        /*
-        private Task InsertTuple()
+            return Task;
+        }
+
+        private void InsertTuple(Database.Tag tag)
+        {
+            InsertAlbum(tag);
+            InsertTrack(tag);
+
+        }
+
+        private () InsertArtist(Database.Tag tag)
+        {
+            
+        }
+
+        private () InsertTrack(Database.Tag tag)
         {
 
         }
 
-        private bool AddArtist()
+        private () InsertAlbumArtist(Database.Tag tag)
         {
-
+            
         }
 
-        private bool AddTrack()
+        private () InsertAlbum(Database.Tag tag)
         {
-
+            
         }
 
-        private bool AddAlbumArtist()
-        {
-
-        }
-
-        private bool AddAlbumArtists()
-        {
-
-        }
-        */
     }
 }
