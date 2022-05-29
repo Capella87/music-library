@@ -21,7 +21,7 @@ namespace MusicLibrary.Database
 
         public long? GetArtistId(string? artist)
         {
-            if (artist == null || artist == "") return null;
+            if (artist == null || artist == "") return -1;
 
             _library.DBConnection.Open();
 

@@ -146,7 +146,7 @@ namespace MusicLibrary.Database
 
         public long? GetGenreId(string? genre)
         {
-            if (genre == null || genre == "") return null;
+            if (genre == null || genre == "") return -1;
 
             _library.DBConnection.Open();
 
