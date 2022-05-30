@@ -201,8 +201,7 @@ namespace MusicLibrary.Scanner
 
                 foreach (var target in info.ScanTarget)
                 {
-                    DateTime dbTime;
-                    info.DatabaseModifiedTimes.TryGetValue(target.Item1, out dbTime);
+                    info.DatabaseModifiedTimes.TryGetValue(target.Item1, out DateTime dbTime);
 
                     if (target.Item2 > dbTime)
                     {
@@ -378,10 +377,6 @@ namespace MusicLibrary.Scanner
                     trackId = _tracks.AddTrack(tag, albumId, artistId, genreId);
 
                 return (trackId, albumId);
-            }
-            catch (SqliteException e)
-            {
-                throw;
             }
             finally
             {
