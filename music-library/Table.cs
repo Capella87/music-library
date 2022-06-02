@@ -61,6 +61,7 @@ namespace MusicLibrary.Utilities
         {
             var tableString = new StringBuilder();
             var colsLength = GetColumnsMaxStrLengths();
+            var consoleWindowWidth = Console.WindowWidth;
             
             var rowStringFormat = Enumerable
                 .Range(0, _columns.Count)
