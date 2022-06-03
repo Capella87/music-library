@@ -9,7 +9,7 @@ namespace MusicLibrary.Scanner
         private Database.TrackDatabase _tracks;
         private Database.AlbumDatabase _albums;
         private Database.ArtistDatabase _artists;
-        private Result.ImportResult<Uri> _result;
+        private Report.ImportReport<Uri> _result;
         private Dictionary<Uri, Database.Tag> _retrievedTags;
 
         private readonly object _scanLock = new Object();
@@ -48,7 +48,7 @@ namespace MusicLibrary.Scanner
             _artists = new Database.ArtistDatabase(_library);
         }
 
-        public async Task<Result.ImportResult<Uri>> UpdateDatabase(State.ScanType scanType, List<Uri> targets)
+        public async Task<Report.ImportReport<Uri>> UpdateDatabase(State.ScanType scanType, List<Uri> targets)
         {
             if (scanType == State.ScanType.FullScan)
             {
@@ -131,7 +131,7 @@ namespace MusicLibrary.Scanner
         {
             var (files, directories, streams) = GetUriObjects(State.ScanType.NewEntryScan, targets, out List<Uri> failed);
 
-            _result = new Result.ImportResult<Uri>(files.Count);
+            _result = new Report.ImportReport<Uri>(files.Count);
 
             List<Uri>? databaseEntitiesUri = null;
             if (scanType == State.ScanType.NewEntryScan)

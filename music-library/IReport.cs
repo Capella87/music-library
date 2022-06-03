@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicLibrary.Result
+namespace MusicLibrary.Report
 {
-    interface IResult<T>
+    interface IReport<T>
     {
-        public void PrintResult(bool isVerbose);
+        public void PrintReport(bool isVerbose);
         public void AddErrorEntryList(T item);
         public void AddSuccessCount();
     }

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 using MusicLibrary;
 
-namespace MusicLibrary.Result
+namespace MusicLibrary.Report
 {
-    public struct ImportResult<T> : IResult<T>
+    public struct ImportReport<T> : IReport<T>
     {
         private List<T> _failedEntries;
         private readonly static object _lock = new();
@@ -51,13 +51,13 @@ namespace MusicLibrary.Result
             }
         }
 
-        public ImportResult(int total)
+        public ImportReport(int total)
         {
             _total = total;
             _failedEntries = new List<T>();
         }
 
-        public ImportResult(int total, List<T> t)
+        public ImportReport(int total, List<T> t)
         {
             _total = total;
             _failedEntries = t;
@@ -71,7 +71,7 @@ namespace MusicLibrary.Result
         /// Show results.
         /// </summary>
         /// <param name="isVerbose">An option to show failed entries. Default is false.</param>
-        public void PrintResult(bool isVerbose = false)
+        public void PrintReport(bool isVerbose = false)
         {
             Console.WriteLine("Import Report");
             Console.ForegroundColor = ConsoleColor.Green;

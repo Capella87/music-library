@@ -29,7 +29,7 @@ namespace MusicLibrary.Commands
 
             try
             {
-                Result.ImportResult<Uri> result;
+                Report.ImportReport<Uri> result;
                 using (_connection = library.DBConnection)
                 {
                     if (_connection == null) throw new NullReferenceException("Database connection is wrong.");
@@ -49,7 +49,7 @@ namespace MusicLibrary.Commands
 
                     result = await scan.UpdateDatabase(State.ScanType.NewEntryScan, targets);
 
-                    result.PrintResult();
+                    result.PrintReport();
                 }
             }
             catch (NullReferenceException e)
@@ -106,7 +106,7 @@ namespace MusicLibrary.Commands
 
             try
             {
-                Result.ImportResult<Uri> result;
+                Report.ImportReport<Uri> result;
                 using (_connection = library.DBConnection)
                 {
                     if (_connection == null) throw new NullReferenceException("Database connection is wrong.");
@@ -126,7 +126,7 @@ namespace MusicLibrary.Commands
 
                     result = await scan.UpdateDatabase(State.ScanType.NewEntryScan, targets);
 
-                    result.PrintResult();
+                    result.PrintReport();
                 }
             }
             catch (NullReferenceException e)
