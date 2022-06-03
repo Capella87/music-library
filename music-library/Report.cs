@@ -9,6 +9,42 @@ using MusicLibrary;
 
 namespace MusicLibrary.Report
 {
+    public struct SearchReport<T> : IReport<T>
+    {
+        private int _total;
+        // private string _conditions;
+
+        public int Total
+        {
+            get
+            {
+                return _total;
+            }
+        }
+
+        public SearchReport(int total)
+        {
+            _total = total;
+        }
+
+        public void PrintReport(bool isVerbose = false)
+        {
+            Console.WriteLine("\nSearch Report:");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(Total);
+            Console.ResetColor();
+            Console.WriteLine(" entries were found.");
+        }
+
+        public void AddErrorEntryList(T item)
+        {
+        }
+
+        public void AddSuccessCount()
+        {
+        }
+    }
+
     public struct ImportReport<T> : IReport<T>
     {
         private List<T> _failedEntries;
@@ -73,7 +109,7 @@ namespace MusicLibrary.Report
         /// <param name="isVerbose">An option to show failed entries. Default is false.</param>
         public void PrintReport(bool isVerbose = false)
         {
-            Console.WriteLine("Import Report");
+            Console.WriteLine("\nImport Report:");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write($"{SuccessCount} files imported");
             Console.ForegroundColor = ConsoleColor.Red;

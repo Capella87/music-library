@@ -37,6 +37,7 @@ namespace MusicLibrary.Commands
 
                     var table = new DataTable();
                     table.Load(result);
+                    connection.Close();
 
                     var columns = table.Columns;
                     var columnStrings = new String[columns.Count];
@@ -52,7 +53,8 @@ namespace MusicLibrary.Commands
                     }
 
                     resultTable.Print();
-                    connection.Close();
+                    var report = new Report.SearchReport<int>(rows.Count);
+                    report.PrintReport();
                 }
             }
             catch (SqliteException e)
