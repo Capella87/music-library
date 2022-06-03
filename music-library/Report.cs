@@ -29,7 +29,7 @@ namespace MusicLibrary.Report
 
         public void PrintReport(bool isVerbose = false)
         {
-            Console.WriteLine("\nSearch Report:");
+            Console.WriteLine("Search Report:");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write(Total);
             Console.ResetColor();
@@ -109,7 +109,7 @@ namespace MusicLibrary.Report
         /// <param name="isVerbose">An option to show failed entries. Default is false.</param>
         public void PrintReport(bool isVerbose = false)
         {
-            Console.WriteLine("\nImport Report:");
+            Console.WriteLine("Import Report:");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write($"{SuccessCount} files imported");
             Console.ForegroundColor = ConsoleColor.Red;
