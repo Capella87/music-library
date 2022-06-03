@@ -37,6 +37,7 @@ namespace MusicLibrary.Commands
                                 if (connection == null) throw new NullReferenceException("Database connection is wrong.");
                                 library.Reset();
                             }
+                            Console.WriteLine("Done.");
                         }
                         catch (NullReferenceException e)
                         {
