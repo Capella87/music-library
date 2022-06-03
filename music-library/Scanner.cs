@@ -75,7 +75,8 @@ namespace MusicLibrary.Scanner
             {
                 if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
                     streams.Add(uri);
-                else if (uri.Scheme == Uri.UriSchemeFile && (File.Exists(uri.AbsolutePath) || Directory.Exists(uri.AbsolutePath)))
+                else if (uri.Scheme == Uri.UriSchemeFile && 
+                    (File.Exists(PathTools.GetUnescapedAbsolutePath(uri)) || Directory.Exists(PathTools.GetUnescapedAbsolutePath(uri))))
                     q.Enqueue(uri);
             }
 
@@ -299,6 +300,7 @@ namespace MusicLibrary.Scanner
                     return -1;
                 }
             }
+            Console.WriteLine();
             _retrievedTags.Clear();
             return 0;
         }
