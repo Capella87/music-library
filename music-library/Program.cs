@@ -43,7 +43,13 @@ namespace MusicLibrary
 
             var listCommand = new Command("list", "Show entries in the library.")
             {
+                
             };
+
+            listCommand.SetHandler(async () =>
+            {
+                await Commands.List.PrintEntries(_dbPath, _dbName);
+            });
 
             var updateCommand = new Command("update", "Update database in specified directories.")
             {
