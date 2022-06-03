@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using MusicLibrary;
 
 namespace MusicLibrary.Utilities
-{
+{ 
     // Source : https://genert.org/blog/csharp-programming/
     public class Table
     {
         private List<object> _columns;
-        private List<object[]> _rows;
+        private List<object?[]> _rows;
+        // private List<Type> _columnTypes;
 
         public Table(params string[] columns)
         {
@@ -19,10 +20,10 @@ namespace MusicLibrary.Utilities
                 throw new ArgumentException("Parameter cannot be null nor empty.");
 
             _columns = new List<object>(columns);
-            _rows = new List<object[]>();
+            _rows = new List<object?[]>();
         }
 
-        public void Add(params object[] values)
+        public void Add(params object?[] values)
         {
             if (values == null)
                 throw new ArgumentException("Parameter cannot be null");
@@ -38,7 +39,7 @@ namespace MusicLibrary.Utilities
             
             for (int i = 0; i < _columns.Count; i++)
             {
-                List<object> columnRow = new List<object>();
+                List<object?> columnRow = new List<object?>();
                 int max = 0;
 
                 columnRow.Add(_columns[i]);
@@ -47,10 +48,11 @@ namespace MusicLibrary.Utilities
 
                 foreach (var e in columnRow)
                 {
-                    int length = e.ToString().Length;
+                    int length = (e == null) ? 4 : e.ToString().Length;
                     if (max < length) max = length;
                 }
-                
+
+                if (max >= 25) max = 25;
                 columnsLen.Add(max);
             }
             
@@ -73,7 +75,7 @@ namespace MusicLibrary.Utilities
 
             int maximumRowLength = Math.Max(0,
                 _rows.Any() ? _rows.Max(row => string.Format(rowStringFormat, row).Length) : 0);
-            int maximumLineLength = Math.Max(maximumRowLength, columnHeaders.Length);
+            int maximumLineLength = Math.Min(maximumRowLength, columnHeaders.Length);
 
             string dividerLine = string.Join("", Enumerable.Repeat("-", maximumLineLength - 1));
             string divider = $" {dividerLine} ";
