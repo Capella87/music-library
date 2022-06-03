@@ -40,7 +40,7 @@ namespace MusicLibrary.Commands
                     connection.Close();
 
                     var columns = table.Columns;
-                    var columnStrings = new String[columns.Count];
+                    var columnStrings = new string[columns.Count];
                     for (int i = 0; i < columns.Count; i++)
                         columnStrings[i] = columns[i].ToString();
 
