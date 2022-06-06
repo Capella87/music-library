@@ -77,7 +77,7 @@ namespace MusicLibrary.Utilities
                 _rows.Any() ? _rows.Max(row => string.Format(rowStringFormat, row).Length) : 0);
             int maximumLineLength = Math.Min(maximumRowLength, columnHeaders.Length);
 
-            string dividerLine = string.Join("", Enumerable.Repeat("-", maximumLineLength - 1));
+            string dividerLine = string.Join("", Enumerable.Repeat("-", maximumLineLength > 0 ? maximumLineLength - 1 : 0));
             string divider = $" {dividerLine} ";
 
             tableString.AppendLine(divider);
