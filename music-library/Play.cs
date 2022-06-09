@@ -73,7 +73,10 @@ namespace MusicLibrary.Commands
                 for (int i = 1; i < target.Columns.Count; i++)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"{target.Columns[i]}\n----");
+                    Console.WriteLine($"{target.Columns[i]}");
+                    for (int j = 0; j < target.Columns[i].ColumnName.Length; j++)
+                        Console.Write("-");
+                    Console.WriteLine();
                     Console.ResetColor();
 
                     Console.WriteLine(target.Rows[0][i]);
