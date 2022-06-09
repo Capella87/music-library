@@ -82,8 +82,11 @@ namespace MusicLibrary.Commands
                     Console.WriteLine(target.Rows[0][i]);
                     Console.WriteLine();
                 }
+                string origTitle = Console.Title;
+                Console.Title = $"{target.Rows[0][3]} - {target.Rows[0][1]}";
                 var process = Process.Start(_playerPath, _playArgument);
                 await process.WaitForExitAsync();
+                Console.Title = origTitle;
             }
             catch (InvalidOperationException e)
             {
