@@ -225,11 +225,34 @@ namespace MusicLibrary
 
             var statsCommand = new Command("stats", "Show statistics.");
 
+            var trackOption = new Option<string?>(
+                name: "--track",
+                description: "Search a keyword by track."
+                )
+                {
+                    Arity = ArgumentArity.ExactlyOne,
+                    AllowMultipleArgumentsPerToken = false
+                };
+
+            var playCommand = new Command("play", "Play music using FFmpeg. Requires FFmpeg.")
+            {
+                trackOption
+            };
+            playCommand.SetHandler(async (string query) =>
+            {
+                var library = new Library(_dbPath, _dbName, true);
+                var play = new MusicLibrary.Commands.Play(library);
+
+                await play.SearchTrack(query);
+            }, trackOption);
+
+
             rootCommand.AddCommand(configCommand);
             rootCommand.AddCommand(exportCommand);
             rootCommand.AddCommand(importCommand);
             rootCommand.AddCommand(listCommand);
             rootCommand.AddCommand(moveCommand);
+            rootCommand.AddCommand(playCommand);
             rootCommand.AddCommand(playlistCommand);
             rootCommand.AddCommand(removeCommand);
             rootCommand.AddCommand(resetCommand);
