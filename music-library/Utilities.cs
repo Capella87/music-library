@@ -1,14 +1,52 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-
-using Microsoft.Data.Sqlite;
-using System.CommandLine.Parsing;
 
 namespace MusicLibrary.Utilities
 {
+    public static class ExecutableTools
+    {
+        public static string GetExecutablePath(string targetName)
+        {
+            if (string.IsNullOrWhiteSpace(targetName)) throw new ArgumentNullException("Invalid target name.");
+
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                string pathVariables = Environment.GetEnvironmentVariable("PATH");
+                var paths = pathVariables.Split(';');
+                string targetPath = "";
+
+                targetPath = paths.Select(x => Path.Combine(x, targetName + ".exe")).FirstOrDefault(x => File.Exists(x));
+
+                // If the file is not found in path variables, Find executable on current directory.
+                if (string.IsNullOrWhiteSpace(targetPath))
+                {
+                    targetPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), targetName + ".exe");
+                    if (!File.Exists(targetPath)) throw new FileNotFoundException();
+                }
+
+                return targetPath;
+            }
+            else if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                throw new PlatformNotSupportedException();
+            }
+            else throw new PlatformNotSupportedException();
+        }
+
+        public static string GetArguments(string[] args)
+        {
+            var rt = new StringBuilder();
+
+            foreach (var i in args)
+            {
+                rt.Append(i);
+                rt.Append(' ');
+            }
+
+            return rt.ToString();
+        }
+    }
+
     public static class PathTools
     {
         /// <summary>
