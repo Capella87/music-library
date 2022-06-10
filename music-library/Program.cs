@@ -243,6 +243,8 @@ namespace MusicLibrary
                 var library = new Library(_dbPath, _dbName, true);
                 var play = new MusicLibrary.Commands.Play(library);
 
+                if (play.PlayerPath == null) return;
+
                 await play.SearchTrack(query);
             }, trackOption);
 

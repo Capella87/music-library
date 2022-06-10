@@ -19,6 +19,8 @@ namespace MusicLibrary.Commands
         private string _playerName;
         private string _playArgument;
 
+        public string? PlayerPath { get { return _playerPath; } }
+
         public Play(Database.Library library, string playerName = "ffplay")
         {
             if (library == null || library.DBConnection == null) throw new ArgumentNullException("No library connection.");
