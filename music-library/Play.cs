@@ -151,26 +151,66 @@ namespace MusicLibrary.Commands
                     table.Load(result);
                     connection.Close();
 
-                    var columns = new string[5];
-                    for (int i = 0; i < 5; i++)
-                        columns[i] = table.Columns[i].ToString();
-
                     // No result.
                     if (table.Rows.Count == 0)
                     {
                         Console.WriteLine("There's no result.");
-                        return 0;
                     }
                     else if (table.Rows.Count == 1)
                     {
                         await PlayMusic(RetrieveData(table, 0));
-
-                        return 1;
                     }
                     else
                     {
-                        return 0;
+                        // Show results
+                        var columns = new string[5];
+                        for (int i = 0; i < 4; i++)
+                            columns[i] = table.Columns[i].ToString();
+                        columns[4] = table.Columns[6].ToString();
+                        var selectTable = new Utilities.Table(columns);
+
+                        var rows = table.Rows;
+                        for (int i = 0; i < rows.Count; i++)
+                        {
+                            var rowElements = rows[i].ItemArray[0..4].Concat(rows[i].ItemArray[6..7]).ToArray();
+                            selectTable.Add(rowElements);
+                        }
+                        selectTable.Print();
+
+                        int selected = -1;
+                        // selection
+                        // selected = Utilities.AskDialog("Select Music", 123);
+                        // if (selected == -1)
+                        do
+                        {
+                            try
+                            {
+                                Console.Write("What track to run : ");
+                                selected = int.Parse(Console.ReadLine());
+                                if (selected < -1 || selected > rows.Count) throw new ArgumentOutOfRangeException();
+                                else break;
+                            }
+                            catch (FormatException e)
+                            {
+                                Console.WriteLine("Wrong input.");
+                            }
+                            catch (ArgumentOutOfRangeException e)
+                            {
+                                Console.WriteLine("Your input is out of range.");
+                            }
+                        } while (true);
+
+                        // It would be changed to use CancellationToken?
+                        if (selected == -1)
+                        {
+                            Console.WriteLine("Abort.");
+                            return 1;
+                        }
+
+                        await PlayMusic(RetrieveData(table, selected - 1));
                     }
+
+                    return 0;
                 }
             }
             catch (SqliteException e)
