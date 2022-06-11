@@ -187,7 +187,7 @@ namespace MusicLibrary.Commands
                         {
                             try
                             {
-                                Console.Write("What track to run : ");
+                                Console.Write("Which track you want to play : ");
                                 selected = int.Parse(Console.ReadLine());
                                 if (selected < -1 || selected > rows.Count) throw new ArgumentOutOfRangeException();
                                 else break;
