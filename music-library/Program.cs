@@ -11,6 +11,9 @@ using MusicLibrary.Utilities;
 using MusicLibrary.Database;
 using System.CommandLine.Invocation;
 
+using Serilog;
+using Microsoft.Extensions.Configuration.Json; 
+
 namespace MusicLibrary
 {
     public static class Program
