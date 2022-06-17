@@ -21,6 +21,12 @@ namespace MusicLibrary.Commands
 
         public string? PlayerPath { get { return _playerPath; } }
 
+        /// <summary>
+        /// Play class constructor.
+        /// </summary>
+        /// <param name="library">Music library database.</param>
+        /// <param name="playerName">External player name. Default player is FFplay in FFmpeg.</param>
+        /// <exception cref="ArgumentNullException">Throw an exception when there's no library connection.</exception>
         public Play(Database.Library library, string playerName = "ffplay")
         {
             if (library == null || library.DBConnection == null) throw new ArgumentNullException("No library connection.");
@@ -61,6 +67,11 @@ namespace MusicLibrary.Commands
             }
         }
 
+        /// <summary>
+        /// Play music selected by user using external player.
+        /// </summary>
+        /// <param name="target">Target music track to be played.</param>
+        /// <returns></returns>
         public async Task<int> PlayMusic(DataTable target)
         {
             /*
@@ -104,6 +115,13 @@ namespace MusicLibrary.Commands
         }
 
         // These methods will be moved to Search class after v0.1.0 version to implement Search fully.
+
+        /// <summary>
+        /// Reassemble target row to provide information for playing.
+        /// </summary>
+        /// <param name="t">Target table.</param>
+        /// <param name="idx">User selected row index.</param>
+        /// <returns></returns>
         private DataTable RetrieveData(DataTable t, int idx)
         {
             var rt = new DataTable();
@@ -127,6 +145,11 @@ namespace MusicLibrary.Commands
             return rt;
         }
 
+        /// <summary>
+        /// Search Tracks and show results when there are more than or equal to two results.
+        /// </summary>
+        /// <param name="query">A keyword to search.</param>
+        /// <returns></returns>
         public async Task<int> SearchTrack(string query)
         {
             try
@@ -146,14 +169,13 @@ namespace MusicLibrary.Commands
                                 WHERE t.artist_id = a.id AND t.album_id = alb.id AND t.genre_id = g.id AND alb.album_artist_id = aa.id AND t.title like @keyword
                                 ORDER BY t.title ASC
                             ";
-                    command.Parameters.Add("@keyword", SqliteType.Text).Value =  "%" + query + "%";
+                    command.Parameters.Add("@keyword", SqliteType.Text).Value = "%" + query + "%";
                     var result = command.ExecuteReader();
 
                     var table = new DataTable();
                     table.Load(result);
                     connection.Close();
 
-                    // No result.
                     if (table.Rows.Count == 0)
                     {
                         Console.WriteLine("There's no result.");
@@ -162,7 +184,7 @@ namespace MusicLibrary.Commands
                     {
                         await PlayMusic(RetrieveData(table, 0));
                     }
-                    else
+                    else // Two or more results
                     {
                         // Show results
                         var columns = new string[5];
