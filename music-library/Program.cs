@@ -12,7 +12,15 @@ using MusicLibrary.Database;
 using System.CommandLine.Invocation;
 
 using Serilog;
-using Microsoft.Extensions.Configuration.Json; 
+using Serilog.Settings.Configuration;
+using Serilog.Configuration;
+using Serilog.Core;
+using Serilog.Events;
+using Serilog.Debugging;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MusicLibrary
 {
@@ -22,9 +30,29 @@ namespace MusicLibrary
             , Environment.SpecialFolderOption.Create);
         private static string _dbName = @"musiclibrary.db";
 
-        public static async Task<int> Main(string[] args)
+        private static Logger? _logger;
+        private static IConfigurationRoot? _configuration;
+
+        public static IHost BuildHost() =>
+            new HostBuilder()
+            // .ConfigureServices(services => services.AddSingleton<IHostedService, PrintTimeService>())
+            .UseSerilog()
+            .Build();
+
+        public static async Task Main(string[] args)
         {
-            return await Run(args);
+            _configuration = new ConfigurationBuilder()
+                // .SetBasePath(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic
+            // , Environment.SpecialFolderOption.Create)))
+                .AddJsonFile("mulibappsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            _logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(_configuration)
+                .CreateLogger();
+
+            BuildHost().Run();
+            await Run(args);
         }
 
         public static async Task<int> Run(string[] args)
@@ -193,8 +221,6 @@ namespace MusicLibrary
             {
 
             };
-
-            var silentOption = new Option("--silent", "Running command without questions.");
 
             var resetCommand = new Command("reset", "Reset library.")
             {
