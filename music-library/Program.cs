@@ -1,26 +1,12 @@
-using System;
-using System.Linq;
-using System.IO;
-using System.Threading;
-using System.Collections.Generic;
-
-using System.CommandLine;
-using System.CommandLine.Help;
-
-using MusicLibrary.Utilities;
-using MusicLibrary.Database;
-using System.CommandLine.Invocation;
-
-using Serilog;
-using Serilog.Settings.Configuration;
-using Serilog.Configuration;
-using Serilog.Core;
-using Serilog.Events;
-using Serilog.Debugging;
-
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using MusicLibrary.Database;
+using MusicLibrary.Utilities;
+using Serilog;
+using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Hosting;
+using System.CommandLine.NamingConventionBinder;
+using System.CommandLine.Parsing;
 
 namespace MusicLibrary
 {
@@ -28,34 +14,10 @@ namespace MusicLibrary
     {
         private static string _dbPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic
             , Environment.SpecialFolderOption.Create);
+
         private static string _dbName = @"musiclibrary.db";
 
-        private static Logger? _logger;
-        private static IConfigurationRoot? _configuration;
-
-        public static IHost BuildHost() =>
-            new HostBuilder()
-            // .ConfigureServices(services => services.AddSingleton<IHostedService, PrintTimeService>())
-            .UseSerilog()
-            .Build();
-
         public static async Task Main(string[] args)
-        {
-            _configuration = new ConfigurationBuilder()
-                // .SetBasePath(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic
-            // , Environment.SpecialFolderOption.Create)))
-                .AddJsonFile("mulibappsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            _logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(_configuration)
-                .CreateLogger();
-
-            BuildHost().Run();
-            await Run(args);
-        }
-
-        public static async Task<int> Run(string[] args)
         {
             if (!File.Exists(PathTools.GetPath(_dbPath, _dbName)))
             {
@@ -65,16 +27,26 @@ namespace MusicLibrary
                 myLibrary.Disconnect();
             }
 
-            return await ParseCommand(args);
+            await ParseCommand()
+            .UseHost(_ => Host.CreateDefaultBuilder(),
+            host =>
+            {
+                host.UseSerilog();
+                host.ConfigureServices((hostContext, services) =>
+                {
+                });
+            })
+            .UseDefaults()
+            .Build()
+            .InvokeAsync(args);
         }
 
-        private static async Task<int> ParseCommand(string[] args)
+        private static CommandLineBuilder ParseCommand()
         {
             var rootCommand = new RootCommand("A music library implementation in C#");
 
             var listCommand = new Command("list", "Show entries in the library.")
             {
-                
             };
 
             listCommand.SetHandler(async () =>
@@ -84,7 +56,6 @@ namespace MusicLibrary
 
             var updateCommand = new Command("update", "Update database in specified directories.")
             {
-
             };
 
             var directoryOption = new Option<string?>(
@@ -213,18 +184,15 @@ namespace MusicLibrary
             }, directoryOption, fileOption);
 
             var removeCommand = new Command("remove", "Remove an entry or specified directory from the library.")
-            {      
-
+            {
             };
 
             var searchCommand = new Command("search", "Search library.")
             {
-
             };
 
             var resetCommand = new Command("reset", "Reset library.")
             {
-
             };
 
             resetCommand.SetHandler(async () =>
@@ -234,22 +202,18 @@ namespace MusicLibrary
 
             var exportCommand = new Command("export", "Export library as a database file or playlist.")
             {
-
             };
 
             var playlistCommand = new Command("playlist", "Run playlist tools.")
             {
-
             };
 
             var moveCommand = new Command("move", "Move or copy a item.")
             {
-
             };
 
             var configCommand = new Command("config", "Show or edit user settings.")
             {
-
             };
 
             var statsCommand = new Command("stats", "Show statistics.");
@@ -258,10 +222,10 @@ namespace MusicLibrary
                 name: "--track",
                 description: "Search a keyword by track."
                 )
-                {
-                    Arity = ArgumentArity.ExactlyOne,
-                    AllowMultipleArgumentsPerToken = false
-                };
+            {
+                Arity = ArgumentArity.ExactlyOne,
+                AllowMultipleArgumentsPerToken = false
+            };
 
             var playCommand = new Command("play", "Play music using FFmpeg. Requires FFmpeg.")
             {
@@ -277,7 +241,6 @@ namespace MusicLibrary
                 await play.SearchTrack(query);
             }, trackOption);
 
-
             rootCommand.AddCommand(configCommand);
             rootCommand.AddCommand(exportCommand);
             rootCommand.AddCommand(importCommand);
@@ -291,7 +254,7 @@ namespace MusicLibrary
             rootCommand.AddCommand(statsCommand);
             rootCommand.AddCommand(updateCommand);
 
-            return await rootCommand.InvokeAsync(args);
+            return new CommandLineBuilder(rootCommand);
         }
     }
 }
