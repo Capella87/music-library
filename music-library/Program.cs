@@ -19,6 +19,11 @@ namespace MusicLibrary
 
         public static async Task Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File(Path.Combine(_dbPath, "mulib_.log"), rollingInterval: RollingInterval.Year)
+                .CreateLogger();
+
             if (!File.Exists(PathTools.GetPath(_dbPath, _dbName)))
             {
                 Console.WriteLine("Welcome to mulib!");
@@ -39,6 +44,8 @@ namespace MusicLibrary
             .UseDefaults()
             .Build()
             .InvokeAsync(args);
+
+            Log.CloseAndFlush();
         }
 
         private static CommandLineBuilder ParseCommand()
