@@ -15,16 +15,10 @@ namespace MusicLibrary.Config
             public string[]? Directories { get; set; }
             public string[]? Files { get; set; }
 
-            public string? DatabaseName { get; set; }
             public string? DatabasePath { get; set; }
 
             public bool EnableScanSubdirectories { get; set; }
             public bool EnableAutoUpdateLibrary { get; set; }
-        }
-
-        public class Logging
-        {
-            public string? LogFilePath { get; set; }
         }
 
         public class Player
@@ -47,9 +41,5 @@ namespace MusicLibrary.Config
             public string? ValueType { get; set; }
             public string? Value { get; set; }
         }
-    }
-
-    namespace DefaultSettings
-    {
     }
 }
