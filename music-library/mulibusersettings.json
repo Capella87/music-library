@@ -1,5 +1,5 @@
 {
-    "MusicLibrary": {
+    "Library": {
         "Directories": [
             null
         ],
@@ -8,9 +8,35 @@
             null
         ],
 
-        "EnableScanSubdirectories": true,
-
         "DatabasePath": null,
-        i
+
+        "EnableScanSubdirectories": true,
+        "EnableAutoUpdateLibrary": false
+    },
+
+    "Player": {
+        "DefaultPlayer": null,
+        "Players": [
+        ]
+    },
+
+    "Serilog": {
+        "Using": [ "Serilog.Sinks.File" ],
+        "MinimumLevel": {
+            "Default": "Debug"
+        },
+        "WriteTo": [
+            {
+                "Name": "File",
+                "Args": {
+                    "path": null,
+                    "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
+                    "rollOnFileSizeLimit": false,
+                    "fileSizeLimitBytes": 4194304,
+                    "retainedFileCountLimit": 12,
+                    "rollingInterval": "Month"
+                }
+            }
+        ]
     }
 }
