@@ -18,6 +18,11 @@ namespace MusicLibrary.Config
     {
         public static class Settings
         {
+            /// <summary>
+            /// Retrieve MulibUserSettingsPath value from appsettings.json.
+            /// </summary>
+            /// <param name="appsettings">Configurations from appsettings.json</param>
+            /// <returns>Returns retrieved path string.</returns>
             public static string? GetUserSettingsPath(IConfiguration appsettings)
             {
                 var userSettingsPath = appsettings.Get<AppSettings.AppSettings>().MulibUserSettingsPath;
@@ -25,6 +30,11 @@ namespace MusicLibrary.Config
                 return userSettingsPath;
             }
 
+            /// <summary>
+            /// Check mulibusersettings.json is exist in appsettings.json.
+            /// </summary>
+            /// <param name="appsettings">Configurations from appsettings.json</param>
+            /// <returns>Returns true if the file path is specified in the JSON file. Otherwise, returns false.</returns>
             public static bool HasUserSettings(IConfiguration appsettings)
             {
                 var path = GetUserSettingsPath(appsettings);
@@ -32,6 +42,11 @@ namespace MusicLibrary.Config
                 return path != "";
             }
 
+            /// <summary>
+            /// Copy mulibusersettings.json and insert database and log file path.
+            /// </summary>
+            /// <param name="appsettings">Configurations from appsettings.json</param>
+            /// <returns>Returns true all works were done successfully. Otherwise, returns false.</returns>
             public static bool ConfigureSettings(IConfiguration appsettings)
             {
                 // Copy mulibusersettings.json to default path.
@@ -84,7 +99,13 @@ namespace MusicLibrary.Config
                 return true;
             }
 
-            public static bool WriteToSettings(string path, IConfiguration configTarget)
+            /// <summary>
+            /// Write modified configurations to configuration file.
+            /// </summary>
+            /// <param name="path">Configuration file path</param>
+            /// <param name="configTarget">Updated configuration</param>
+            /// <returns></returns>
+            public static bool WriteToSettings(string path, AppSettings.AppSettings configTarget)
             {
                 var writeOptions = new JsonSerializerOptions()
                 {
@@ -98,6 +119,12 @@ namespace MusicLibrary.Config
                 return true;
             }
 
+            /// <summary>
+            /// Get serialized settings from configuration file using Json.NET.
+            /// </summary>
+            /// <param name="path">Configuration file path</param>
+            /// <param name="settings">JsonConverter collections used in Json.NET</param>
+            /// <returns>Returns serialized dynamic object.</returns>
             public static dynamic GetSerializedSettings(string path, out JsonSerializerSettings settings)
             {
                 // source: https://makolyte.com/csharp-how-to-update-appsettings-json-programmatically/#Step_3_-_Change_values
