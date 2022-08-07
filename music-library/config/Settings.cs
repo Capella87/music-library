@@ -93,8 +93,39 @@ namespace MusicLibrary.Config
 
 
                 // Update appsettings.json by serialization
-                // appsettings.Get<AppSettings.AppSettings>().MulibUserSettingsPath
-                //    = Path.Combine(configPath);
+                var updated = appsettings.Get<AppSettings.AppSettings>();
+                updated.MulibUserSettingsPath = Path.Combine(configPath);
+
+                var appsettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
+                try
+                {
+                    WriteToSettings(appsettingsPath, updated);
+                    Log.Information($"Update a configuration to {nameof(appsettings)}");
+                }
+                catch (DirectoryNotFoundException e)
+                {
+                    Console.WriteLine($"Cannot write settings to file.");
+                    Log.Error($"Write settings to {appsettingsPath} is failed: Directory is NOT found");
+                    Log.Error(e.StackTrace);
+
+                    return false;
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    Console.WriteLine($"Don't have permission to access the file.");
+                    Log.Error($"Write settings to {appsettingsPath} is failed: Don't have permission to access");
+                    Log.Error(e.StackTrace);
+
+                    return false;
+                }
+                catch (IOException e)
+                {
+                    Console.WriteLine("Fatal: I/O error was occurred.");
+                    Log.Fatal($"Copying file is failed: I/O error was occurred");
+                    Log.Fatal(e!.StackTrace);
+
+                    return false;
+                }
 
                 return true;
             }
