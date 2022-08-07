@@ -39,7 +39,12 @@ namespace MusicLibrary.Config
             {
                 var path = GetUserSettingsPath(appsettings);
 
-                return path != "";
+                if (path == "")
+                {
+                    Log.Warning("mulibusersettings.json path is not set.");
+                    return false;
+                }
+                else return true;
             }
 
             /// <summary>
@@ -59,6 +64,7 @@ namespace MusicLibrary.Config
                     if (!Directory.Exists(defaultPath)) Directory.CreateDirectory(defaultPath);
                     File.Copy(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mulibusersettings.json"),
                     configPath, overwrite: true);
+                    Log.Information($"Copy {"mulibusersettings.json"} to {configPath}");
                 }
                 catch (FileNotFoundException e)
                 {
@@ -76,8 +82,9 @@ namespace MusicLibrary.Config
                 }
                 catch (IOException e)
                 {
-                    Log.Error($"Copying file is failed: I/O error was occurred");
-                    Log.Error(e!.StackTrace);
+                    Console.WriteLine("Fatal: I/O error was occurred.");
+                    Log.Fatal($"Copying file is failed: I/O error was occurred");
+                    Log.Fatal(e!.StackTrace);
 
                     return false;
                 }
@@ -85,11 +92,41 @@ namespace MusicLibrary.Config
 
                 // Update mulibusersettings.json.
                 var configs = GetSerializedSettings(configPath, out JsonSerializerSettings settings);
+                Log.Information($"Get serialized settings from {configPath}");
                 configs.Library.DatabasePath = Path.Combine(defaultPath, "musiclibrary.db");
+                Log.Information($"Set DatabasePath to default: {defaultPath}");
                 configs.Serilog.WriteTo[0].Args.path = Path.Combine(defaultPath, "mulib_.log");
+                Log.Information($"Set log file path to default: {defaultPath}");
 
-                var saved = JsonConvert.SerializeObject(configs, Formatting.Indented, settings);
-                File.WriteAllText(configPath, saved);
+                try
+                {
+                    var saved = JsonConvert.SerializeObject(configs, Formatting.Indented, settings);
+                    File.WriteAllText(configPath, saved);
+                }
+                catch (DirectoryNotFoundException e)
+                {
+                    Console.WriteLine($"Cannot write settings to file.");
+                    Log.Error($"Write settings to {configPath} is failed: Directory is NOT found");
+                    Log.Error(e.StackTrace);
+
+                    return false;
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    Console.WriteLine($"Don't have permission to access the file.");
+                    Log.Error($"Write settings to {configPath} is failed: Don't have permission to access");
+                    Log.Error(e.StackTrace);
+
+                    return false;
+                }
+                catch (IOException e)
+                {
+                    Console.WriteLine("Fatal: I/O error was occurred.");
+                    Log.Fatal($"Copying file is failed: I/O error was occurred");
+                    Log.Fatal(e!.StackTrace);
+
+                    return false;
+                }
 
 
                 // Update appsettings.json by serialization
