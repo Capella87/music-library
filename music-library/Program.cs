@@ -7,6 +7,8 @@ using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
 using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
+using Microsoft.Extensions.Configuration;
+using MusicLibrary.Config.Settings;
 
 namespace MusicLibrary
 {
@@ -19,18 +21,14 @@ namespace MusicLibrary
 
         public static async Task Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.File(Path.Combine(_dbPath, "mulib_.log"), rollingInterval: RollingInterval.Year)
-                .CreateLogger();
+            // Get appsettings.json to check
+            var appconfig = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
 
-            if (!File.Exists(PathTools.GetPath(_dbPath, _dbName)))
-            {
-                Console.WriteLine("Welcome to mulib!");
-                var myLibrary = new Library(_dbPath, _dbName, false);
-                Console.WriteLine("New database file is generated.\n");
-                myLibrary.Disconnect();
-            }
+            // Check mulibusersettings.json location.
+            if (!Settings.HasUserSettings(appconfig))
+                Settings.ConfigureSettings(appconfig);
 
             await ParseCommand()
             .UseHost(_ => Host.CreateDefaultBuilder(),
@@ -39,6 +37,10 @@ namespace MusicLibrary
                 host.UseSerilog();
                 host.ConfigureServices((hostContext, services) =>
                 {
+                });
+                host.ConfigureAppConfiguration( _ =>
+                {
+
                 });
             })
             .UseDefaults()
