@@ -12,8 +12,8 @@ namespace MusicLibrary.Config
     {
         public class Library
         {
-            public string[]? Directories { get; set; }
-            public string[]? Files { get; set; }
+            public List<string>? Directories { get; set; }
+            public List<string>? Files { get; set; }
 
             public string? DatabasePath { get; set; }
 
