@@ -18,25 +18,5 @@
         "DefaultPlayer": null,
         "Players": [
         ]
-    },
-
-    "Serilog": {
-        "Using": [ "Serilog.Sinks.File" ],
-        "MinimumLevel": {
-            "Default": "Debug"
-        },
-        "WriteTo": [
-            {
-                "Name": "File",
-                "Args": {
-                    "path": null,
-                    "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
-                    "rollOnFileSizeLimit": false,
-                    "fileSizeLimitBytes": 4194304,
-                    "retainedFileCountLimit": 12,
-                    "rollingInterval": "Month"
-                }
-            }
-        ]
     }
 }
