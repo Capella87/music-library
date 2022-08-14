@@ -35,8 +35,6 @@ namespace MusicLibrary
                     Settings.InitializeSettings(appconfig, hasPath);
                     appconfig.Reload();
                     Log.Information("Reloaded {appconfig}", "appsettings.json");
-
-                    // Create database file. This should be removed after EF Core migration.
                 }
             }
             catch (FileNotFoundException e)
@@ -61,19 +59,35 @@ namespace MusicLibrary
                 .AddJsonFile(appconfig["MulibLoggingSettingsPath"], optional: false, reloadOnChange: true)
                 .Build();
 
+            var userConf = new ConfigurationBuilder()
+                .AddJsonFile(appconfig["MulibUserSettingsPath"], optional: false, reloadOnChange: true)
+                .Build();
+
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(loggingConf)
                 .CreateLogger();
+
+            // Create database file. This should be removed after EF Core migration.
+            if (!File.Exists(userConf["Library:DatabasePath"]))
+            {
+                Console.WriteLine("Welcome to mulib!");
+                Log.Information("Welcome to Mulib!");
+                var myLibrary = new Library(userConf["Library:DatabasePath"], _dbName, false);
+                Log.Information("Create a new database file in {path}", userConf["Library:DatabasePath"]);
+                Console.WriteLine("New database file is generated.\n");
+                myLibrary.Disconnect();
+            }
 
             await ParseCommand()
             .UseHost(_ => Host.CreateDefaultBuilder(),
             host =>
             {
-                host.ConfigureAppConfiguration( (hostingContext, conf) =>
+                host.ConfigureAppConfiguration((hostingContext, conf) =>
                 {
                     conf.AddConfiguration(appconfig);
                     conf.AddConfiguration(loggingConf);
-                    conf.AddJsonFile(appconfig["MulibUserSettingsPath"], optional: false, reloadOnChange: true);
+                    conf.AddConfiguration(userConf);
+                    conf.Build();
                 });
                 host.ConfigureServices((hostContext, settingsService) =>
                 {
