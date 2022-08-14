@@ -8,9 +8,10 @@ namespace MusicLibrary.Config
 {
     namespace AppSettings
     {
-        public class AppSettings
+        public sealed class AppSettings : ISettings
         {
             public string? MulibUserSettingsPath { get; set; }
+            public string? MulibLoggingSettingsPath { get; set; }
         }
     }
 }
