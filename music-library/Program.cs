@@ -9,6 +9,7 @@ using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
 using Microsoft.Extensions.Configuration;
 using MusicLibrary.Config.Settings;
+using System.Reflection.Metadata.Ecma335;
 
 namespace MusicLibrary
 {
@@ -26,22 +27,58 @@ namespace MusicLibrary
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            // Check mulibusersettings.json location.
-            if (!Settings.HasUserSettings(appconfig))
-                Settings.ConfigureSettings(appconfig);
+            try
+            {
+                var hasPath = Settings.HasConfigFiles(appconfig);
+                if (hasPath != (true, true))
+                {
+                    Settings.InitializeSettings(appconfig, hasPath);
+                    appconfig.Reload();
+                    Log.Information("Reloaded {appconfig}", "appsettings.json");
+
+                    // Create database file. This should be removed after EF Core migration.
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                Log.Fatal(e.Message);
+                Log.Fatal(e.StackTrace!);
+                Log.Fatal("Program is terminated by unexpected exception");
+                return;
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return;
+            }
+            catch (ArgumentNullException e)
+            {
+                return;
+            }
+
+            var loggingConf = new ConfigurationBuilder()
+                .AddJsonFile(appconfig["MulibLoggingSettingsPath"], optional: false, reloadOnChange: true)
+                .Build();
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(loggingConf)
+                .CreateLogger();
 
             await ParseCommand()
             .UseHost(_ => Host.CreateDefaultBuilder(),
             host =>
             {
+                host.ConfigureAppConfiguration( (hostingContext, conf) =>
+                {
+                    conf.AddConfiguration(appconfig);
+                    conf.AddConfiguration(loggingConf);
+                    conf.AddJsonFile(appconfig["MulibUserSettingsPath"], optional: false, reloadOnChange: true);
+                });
+                host.ConfigureServices((hostContext, settingsService) =>
+                {
+                });
                 host.UseSerilog();
-                host.ConfigureServices((hostContext, services) =>
-                {
-                });
-                host.ConfigureAppConfiguration( _ =>
-                {
-
-                });
             })
             .UseDefaults()
             .Build()
