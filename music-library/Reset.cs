@@ -12,6 +12,11 @@ namespace MusicLibrary.Commands
 {
     public static class Reset
     {
+        public static int Run()
+        {
+            return 0;
+        }
+
         public static Task ResetDatabase(string _dbPath, string _dbName)
         {
             var library = new Database.Library(_dbPath, _dbName, true);

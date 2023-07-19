@@ -5,11 +5,15 @@ using Serilog;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
-using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
 using Microsoft.Extensions.Configuration;
+using System.Numerics;
 using MusicLibrary.Config.Settings;
-using System.Reflection.Metadata.Ecma335;
+using System.Text;
+using System.Diagnostics;
+using TagLib.Matroska;
+using System.Reflection;
+using System.Diagnostics.Eventing.Reader;
 
 namespace MusicLibrary
 {
@@ -20,6 +24,67 @@ namespace MusicLibrary
 
         private static string _dbName = @"musiclibrary.db";
 
+        public static void Main(string[] args)
+        {
+            // Force output encoding to UTF-8 on Windows
+            if (Console.IsOutputRedirected && OperatingSystem.IsWindows())
+            {
+                Console.OutputEncoding = Encoding.UTF8;
+            }
+
+            // Measure the startup time
+            DateTime mainNowTimeStamp = DateTime.Now;
+            var startupTimeStamp = mainNowTimeStamp - Process.GetCurrentProcess().StartTime;
+
+            Environment.ExitCode = ProcessArguments(args);
+        }
+
+        internal static int ProcessArguments(string[] args)
+        {
+
+            ParseResult? parseResult = null;
+            try
+            {
+                parseResult = CommandLineParser.Parser.Parse(args);
+
+                if (parseResult.Errors.Count > 0 && parseResult.Tokens.Count > 0)
+                {
+                    Environment.ExitCode = 1;
+                    Environment.Exit(Environment.ExitCode);
+                }
+                else
+                {
+                    Environment.ExitCode = parseResult.Invoke();
+                }
+            }
+            catch (Exception e)
+            {
+                Environment.ExitCode = ExceptionHandler(e, parseResult);
+            }
+
+            return Environment.ExitCode;
+        }
+
+        internal static int ExceptionHandler(Exception exception, ParseResult? parseResult)
+        {
+            if (exception is TargetInvocationException)
+            {
+                exception = exception.InnerException;
+            }
+            else
+            {
+                // Should be changed to
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Unhandled Exception: ");
+                Console.WriteLine(exception.Message);
+                Console.WriteLine(exception.StackTrace);
+                Console.ResetColor();
+            }
+
+            return 1;
+        }
+
+        /*
         public static async Task Main(string[] args)
         {
             // Get appsettings.json to check
@@ -77,6 +142,8 @@ namespace MusicLibrary
                 Console.WriteLine("New database file is generated.\n");
                 myLibrary.Disconnect();
             }
+
+           
 
             await ParseCommand()
             .UseHost(_ => Host.CreateDefaultBuilder(),
@@ -316,5 +383,6 @@ namespace MusicLibrary
 
             return new CommandLineBuilder(rootCommand);
         }
+        */
     }
 }
