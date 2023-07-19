@@ -164,7 +164,7 @@ namespace MusicLibrary.Commands
                         @"
                                 SELECT ROW_NUMBER () OVER ( ORDER BY  t.title ASC ) as 'No', t.title as 'Title', alb.album as 'Album', a.artist as 'Artist', 
                                 aa.album_artist as 'Album Artist', g.genre as 'Genre', t.year as 'Year', t.disc_no as 'Disc No.' , t.track_no as 'Track No.',
-                                t.id as 'trackId', t.absolute_path as 'Path', t.lyrics as 'Lyrics' 
+                                t.id as 'trackId', t.absolute_path as 'Path', t.lyrics as 'UnsyncedLyrics' 
                                 FROM tracks as 't', artists as 'a', albums as 'alb', album_artists as 'aa', genres as 'g'
                                 WHERE t.artist_id = a.id AND t.album_id = alb.id AND t.genre_id = g.id AND alb.album_artist_id = aa.id AND t.title like @keyword
                                 ORDER BY t.title ASC

@@ -212,7 +212,7 @@ namespace MusicLibrary.Database
             command.Parameters.Add(new SqliteParameter("@bitra", tag.Bitrates));
             command.Parameters.Add(new SqliteParameter("@audioSampleRate", tag.AudioSampleRates));
             command.Parameters.Add(new SqliteParameter("@audioChannel", tag.AudioChannels));
-            command.Parameters.Add(new SqliteParameter("@lyri", tag.Lyrics == null ? DBNull.Value : tag.Lyrics));
+            command.Parameters.Add(new SqliteParameter("@lyri", tag.UnsyncedLyrics == null ? DBNull.Value : tag.UnsyncedLyrics));
 
             command.Parameters.Add(new SqliteParameter("@albId", albumId == null ? DBNull.Value : albumId));
             command.Parameters.Add(new SqliteParameter("@artistId", artistId == null ? DBNull.Value : artistId));

@@ -128,6 +128,12 @@ namespace MusicLibrary.Scanner
             return (files, directories, streams);
         }
 
+        /// <summary>
+        /// Scanning audio files in targeted directories
+        /// </summary>
+        /// <param name="scanType">Scanning behavior</param>
+        /// <param name="targets">Target directories to be scanned</param>
+        /// <returns></returns>
         private async Task Scan(State.ScanType scanType, List<Uri> targets)
         {
             var (files, directories, streams) = GetUriObjects(State.ScanType.NewEntryScan, targets, out List<Uri> failed);
@@ -141,7 +147,11 @@ namespace MusicLibrary.Scanner
 
             var databaseTracks = _tracks.GetTracksModifiedTime();
 
-            // Use two thread; it can be changed to use more threads depending on systems...
+            // Check the core count in the host
+
+
+
+            // Use two threads; it can be changed to use more threads depending on systems...
             _retrievedTags = new Dictionary<Uri, Database.Tag>();
 
             int fileCount = files.Count;
@@ -198,7 +208,7 @@ namespace MusicLibrary.Scanner
             try
             {
                 ScanInfo? info = (ScanInfo?)scanInfo;
-                if (info == null) throw new ArgumentNullException("Invalid Scan informations.");
+                if (info == null) throw new ArgumentNullException("Invalid Scan information.");
 
                 foreach (var target in info.ScanTarget)
                 {
@@ -252,7 +262,7 @@ namespace MusicLibrary.Scanner
                     AbsolutePath = absolutePath,
                     DiscNumber = target.Tag.Disc,
                     TrackNumber = target.Tag.Track,
-                    Lyrics = target.Tag.Lyrics
+                    UnsyncedLyrics = target.Tag.Lyrics
                 };
 
                 target.Dispose();
