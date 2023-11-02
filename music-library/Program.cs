@@ -194,7 +194,7 @@ namespace MusicLibrary
 
             };
 
-            var silentOption = new Option("--silent", "Running command without questions.");
+            var silentOption = new Option<Boolean>("--silent", "Running command without questions.");
 
             var resetCommand = new Command("reset", "Reset library.")
             {
